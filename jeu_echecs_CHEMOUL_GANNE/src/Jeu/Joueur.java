@@ -1,3 +1,5 @@
+package Jeu;
+
 public class Joueur {
     private String pseudo;
     private int partiesGagnees;
