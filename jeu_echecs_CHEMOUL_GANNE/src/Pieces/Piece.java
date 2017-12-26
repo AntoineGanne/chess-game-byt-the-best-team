@@ -1,6 +1,8 @@
 package Pieces;
 import Jeu.Case;
 
+import java.util.LinkedList;
+
 public class Piece {
     private String nom;
     private boolean estBlanc;
@@ -50,9 +52,9 @@ public class Piece {
         this.estMange = true;
     }
 
-    public Case[] afficherPossibilitees(int x, int y, Case[][] tabJeu){
+    public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){
 
-        Case[] casesPossibles = new Case[25];
+        LinkedList<Case> casesPossibles = new LinkedList<Case>();
         return casesPossibles;
     }
 

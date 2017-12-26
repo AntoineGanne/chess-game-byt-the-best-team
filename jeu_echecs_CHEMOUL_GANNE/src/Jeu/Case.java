@@ -1,6 +1,7 @@
 package Jeu;
 
 import Pieces.Piece;
+import java.util.*;
 
 public class Case {
     private int x;
@@ -62,12 +63,12 @@ public class Case {
     }
 
     public void afficherPossibilites(Case[][] tabJeu){
-        Case[] poss;
+        LinkedList<Case> poss;
         poss = this.piece.afficherPossibilitees(this.x,this.y, tabJeu);
         System.out.println("Possibilitées de déplacement");
-        for(int i = 0; i<poss.length;i++){
-            if(poss[i]!=null)
-                System.out.println("Coordonnées : " +(poss[i].getX()+1) + "  " + (poss[i].getY()+1));
+        for(int i = 0; i<poss.size();i++){
+            if(poss.get(i)!=null)
+                System.out.println("Coordonnées : " +(poss.get(i).getX()+1) + "  " + (poss.get(i).getY()+1));
         }
     }
 
