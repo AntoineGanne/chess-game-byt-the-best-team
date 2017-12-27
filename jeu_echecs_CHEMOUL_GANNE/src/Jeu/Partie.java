@@ -18,23 +18,38 @@ public class Partie {
 
     public void moteurPartie(){
         initPartie();
-        afficherPartie();
        while(!this.finie) {
+           afficherPartie();
+           int x, y;
            tourPartie t = new tourPartie();
-           System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer.");
-           //verifier que la pièce lui appartient
-           t.saisieChoix();
-           int x = t.getLigne();
-           int y = t.getColonne();
-           Piece aBouger = new Piece(this.plateauJeu.getTabCases()[x][y].getPiece());
-           this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
+           do {
+               System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
+               t.saisieChoix();
+               x = t.getLigne();
+               y = t.getColonne();
+           }
+           while (!((this.plateauJeu.getTabCases()[x][y].getPiece() == null) ||(this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 0) || (!this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 1)));
+           //permet de verifier que la pièce chosie appartient bien au joueur
 
 
+           LinkedList<Case> possibilités = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
 
-
+           System.out.println("Saisissez la possibilité que vous souhaitez appliquer");
+           Scanner sc = new Scanner(System.in);
+           int a = sc.nextInt();
+           while (a > possibilités.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
+               a = sc.nextInt();
+               System.out.println("Cette action n'est pas possible, selectionnez une des " + possibilités.size() + "options");
+           }
+           //gestion du déplacement
+           this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],possibilités.get(a-1).getX(), possibilités.get(a-1).getY());
 
            this.listeTourParties.add(t);
-           finie = true;
+           if (joueurActuel == 1){
+               joueurActuel = 0;
+            }
+           else
+               joueurActuel = 1;
        }
     }
 
@@ -57,8 +72,20 @@ public class Partie {
         else
             System.out.println("C'est a " + j2.getPseudo() + " de jouer.");
         plateauJeu.affichageConsole();
-
     }
 
+    //Test si la partie est finie et gère l'affichage du gagnant
+    public boolean estFinie(){
+        if(this.plateauJeu.getNbrBlanchesMangees() == 16){
+            //afichage gagnant
+            return true;
+        }
+        if(this.plateauJeu.getNbrNoiresMangees() == 16){
+            //afichage gagnant
+            return true;
+        }
+
+        return false;
+    }
 
 }

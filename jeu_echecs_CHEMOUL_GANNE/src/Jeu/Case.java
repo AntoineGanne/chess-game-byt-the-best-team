@@ -62,7 +62,7 @@ public class Case {
         this.piece = piece;
     }
 
-    public void afficherPossibilites(Case[][] tabJeu){
+    public LinkedList<Case> afficherPossibilites(Case[][] tabJeu){
         LinkedList<Case> poss;
         poss = this.piece.afficherPossibilitees(this.x,this.y, tabJeu);
         System.out.println("Possibilitées de déplacement");
@@ -70,9 +70,11 @@ public class Case {
             if(poss.get(i)!=null)
                 System.out.println("Coordonnées : " +(poss.get(i).getX()+1) + "  " + (poss.get(i).getY()+1));
         }
+        return poss;
     }
 
     public boolean estVide(){
-        return (this.piece.isEstMange() || this.piece == null); //ou l'ancienne piece a été mangée ou la case est vide
+        return (this.piece == null ||  this.piece.isEstMange() ); //ou l'ancienne piece a été mangée ou la case est vide
     }
+
 }

@@ -1,4 +1,5 @@
 package Jeu;
+import Pieces.Piece;
 
 import Pieces.Dame;
 import Pieces.Pion;
@@ -10,15 +11,27 @@ import  Pieces.Cavalier;
 public class Plateau {
     private int taille;
     private Case[][] tabCases;
+    private int nbrBlanchesMangees;
+    private int nbrNoiresMangees;
 
     public Plateau(int taille) {
         this.taille = taille;
         tabCases = new Case[taille][taille];
         initialiserPlateau();
+        this.nbrNoiresMangees = 0;
+        this.nbrBlanchesMangees = 0;
     }
 
     public Case[][] getTabCases() {
         return tabCases;
+    }
+
+    public int getNbrBlanchesMangees() {
+        return nbrBlanchesMangees;
+    }
+
+    public int getNbrNoiresMangees() {
+        return nbrNoiresMangees;
     }
 
     public void initialiserPlateau(){
@@ -102,17 +115,21 @@ public class Plateau {
 
     public void affichageConsole(){
         String couleur;
+        System.out.println("  | 1  2  3  4  5  6  7  8");
+        System.out.println("___________________________");
         for(int i = 0;i<taille;i++){
+            System.out.print(i+1 + " | ");
             for(int j=0; j<taille; j++){
                 if(tabCases[i][j].getPiece() == null)
                     System.out.print("__");
                 else{
-                    if(!tabCases[i][j].getPiece().isEstMange()){ //on l'affiche uniquement si elle est pas mangée
-                        if(tabCases[i][j].getPiece().isEstBlanc())
+                    Piece temp = new Piece(tabCases[i][j].getPiece());
+                    if(!temp.isEstMange()){ //on l'affiche uniquement si elle est pas mangée
+                        if(temp.isEstBlanc())
                             couleur = "b";
                         else
                             couleur = "n";
-                        switch(tabCases[i][j].getPiece().getNom()){
+                        switch(temp.getNom()){
                             case "Cavalier" :
                                 System.out.print("C" + couleur);
                                 break;
@@ -144,5 +161,25 @@ public class Plateau {
             }
             System.out.println(" ");
         }
+        System.out.println(" ");
     }
+
+    /**
+     *
+     * @param xFinal coordonee finale x de la piece sur la grille
+     * @param yFinal coordonee finale y de la piece sur la grille
+     */
+    public void deplacerPiecePlateau(Case caseADeplacer, int xFinal, int yFinal){
+        Piece temp = new Piece(tabCases[xFinal][yFinal].getPiece());
+        if(temp != null){ //si la case du déplacement n'est pas vide
+            tabCases[xFinal][yFinal].getPiece().setEstMange(true); //la pièce de la case est mangée
+            if(temp.isEstBlanc())
+                this.nbrBlanchesMangees++; // le nombres de pièces blanches mangées par l'adversaire augmente
+            else
+                this.nbrNoiresMangees++;
+        }
+        tabCases[xFinal][yFinal].setPiece(caseADeplacer.getPiece()); //la nouvelle pièce de la case est la notre
+        caseADeplacer.setPiece(null); //l'ancienne case n'a plus de pièce
+    }
+
 }

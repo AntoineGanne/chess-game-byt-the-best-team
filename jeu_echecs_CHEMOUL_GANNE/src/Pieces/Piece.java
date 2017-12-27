@@ -35,14 +35,6 @@ public class Piece {
         return estBlanc;
     }
 
-    /**
-     *
-     * @param xFinal coordonee finale x de la piece sur la grille
-     * @param yFinal coordonee finale y de la piece sur la grille
-     */
-    public void deplacer(int xFinal, int yFinal){
-
-    }
 
     public String getNom() {
         return nom;
