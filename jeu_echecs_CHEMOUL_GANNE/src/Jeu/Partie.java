@@ -18,38 +18,56 @@ public class Partie {
 
     public void moteurPartie(){
         initPartie();
-       while(!this.finie) {
+        while(!this.finie) {
            afficherPartie();
+
+           //CHOIX D'UNE PIECE A DEPLACER ET AFFICHAGE DES POSSIBILITES DE DEPLACEMENT
            int x, y;
            tourPartie t = new tourPartie();
-           do {
-               System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
-               t.saisieChoix();
-               x = t.getLigne();
-               y = t.getColonne();
+           LinkedList<Case> possibilites = new LinkedList<>();
+           do{
+               do{
+                   System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
+                   t.saisieChoix();
+                   x = t.getLigne();
+                   y = t.getColonne();
+               }
+                while ((this.plateauJeu.getTabCases()[x][y].getPiece() == null) || !((this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 0) || (!this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 1)));
+                //la pièce choisie appartient bien au joueur et n'est pas null
+
+                possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
            }
-           while (!((this.plateauJeu.getTabCases()[x][y].getPiece() == null) ||(this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 0) || (!this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 1)));
-           //permet de verifier que la pièce chosie appartient bien au joueur
+           while(possibilites.size() == 0); //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
 
-
-           LinkedList<Case> possibilités = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
-
+           //CHOIX DU DEPLACEMENT PARMI LES POSSIBILITES
            System.out.println("Saisissez la possibilité que vous souhaitez appliquer");
            Scanner sc = new Scanner(System.in);
            int a = sc.nextInt();
-           while (a > possibilités.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
+           while (a > possibilites.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
                a = sc.nextInt();
-               System.out.println("Cette action n'est pas possible, selectionnez une des " + possibilités.size() + "options");
+               System.out.println("Cette action n'est pas possible, selectionnez une des " + possibilites.size() + " options");
            }
-           //gestion du déplacement
-           this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],possibilités.get(a-1).getX(), possibilités.get(a-1).getY());
 
+           //GESTION DU DEPLACEMENT
+           System.out.println("Vous deplacez votre " + this.plateauJeu.getTabCases()[x][y].getPiece().getNom() + ".");
+           int xFinal = possibilites.get(a-1).getX(); // a-1 car le joueur saisi entre [1,8] et non [0,7]
+           int yFinal = possibilites.get(a-1).getY();
+           t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au tourPartie
+           t.setColonneDeplacFinal(yFinal);
+           this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
            this.listeTourParties.add(t);
+
+
+           //CHANGEMENT DU JOUEUR ET TEST DE FIN DE PARTIE
            if (joueurActuel == 1){
                joueurActuel = 0;
             }
            else
                joueurActuel = 1;
+
+           if(this.estFinie()){
+               finie = true;
+           }
        }
     }
 
@@ -76,11 +94,13 @@ public class Partie {
 
     //Test si la partie est finie et gère l'affichage du gagnant
     public boolean estFinie(){
-        if(this.plateauJeu.getNbrBlanchesMangees() == 16){
+        if(this.plateauJeu.isRoiBlancMort()){
             //afichage gagnant
+            System.out.println("Les noirs ont gagnés ! Bravo !");
             return true;
         }
-        if(this.plateauJeu.getNbrNoiresMangees() == 16){
+        if(this.plateauJeu.isRoiNoirMort()){
+            System.out.println("Les blancs ont gagnés ! Bravo !");
             //afichage gagnant
             return true;
         }

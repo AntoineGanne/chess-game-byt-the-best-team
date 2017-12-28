@@ -11,27 +11,27 @@ import  Pieces.Cavalier;
 public class Plateau {
     private int taille;
     private Case[][] tabCases;
-    private int nbrBlanchesMangees;
-    private int nbrNoiresMangees;
+    private boolean roiBlancMort;
+    private boolean roiNoirMort;
 
     public Plateau(int taille) {
         this.taille = taille;
-        tabCases = new Case[taille][taille];
-        initialiserPlateau();
-        this.nbrNoiresMangees = 0;
-        this.nbrBlanchesMangees = 0;
+        this.tabCases = new Case[taille][taille];
+        this.initialiserPlateau();
+        this.roiBlancMort = false;
+        this.roiNoirMort = false;
     }
 
     public Case[][] getTabCases() {
         return tabCases;
     }
 
-    public int getNbrBlanchesMangees() {
-        return nbrBlanchesMangees;
+    public boolean isRoiBlancMort() {
+        return roiBlancMort;
     }
 
-    public int getNbrNoiresMangees() {
-        return nbrNoiresMangees;
+    public boolean isRoiNoirMort() {
+        return roiNoirMort;
     }
 
     public void initialiserPlateau(){
@@ -170,13 +170,16 @@ public class Plateau {
      * @param yFinal coordonee finale y de la piece sur la grille
      */
     public void deplacerPiecePlateau(Case caseADeplacer, int xFinal, int yFinal){
-        Piece temp = new Piece(tabCases[xFinal][yFinal].getPiece());
-        if(temp != null){ //si la case du déplacement n'est pas vide
+        if(tabCases[xFinal][yFinal].getPiece()!= null) { //si la case du déplacement n'est pas vide
+            System.out.println("Vous avez mangé une pièce de l'adversaire : " + tabCases[xFinal][yFinal].getPiece().getNom() + ".");
             tabCases[xFinal][yFinal].getPiece().setEstMange(true); //la pièce de la case est mangée
-            if(temp.isEstBlanc())
-                this.nbrBlanchesMangees++; // le nombres de pièces blanches mangées par l'adversaire augmente
-            else
-                this.nbrNoiresMangees++;
+            //On regarde si c'est le Roi d'une des couleurs qui est mort
+            if(tabCases[xFinal][yFinal].getPiece().getNom() == "Roi"){
+                if(tabCases[xFinal][yFinal].getPiece().isEstBlanc())
+                    this.roiBlancMort = true;
+                else
+                    this.roiNoirMort = true;
+            }
         }
         tabCases[xFinal][yFinal].setPiece(caseADeplacer.getPiece()); //la nouvelle pièce de la case est la notre
         caseADeplacer.setPiece(null); //l'ancienne case n'a plus de pièce

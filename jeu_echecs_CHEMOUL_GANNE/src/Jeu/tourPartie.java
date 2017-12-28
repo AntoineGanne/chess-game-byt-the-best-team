@@ -3,11 +3,15 @@ package Jeu;
 import java.util.*;
 
 public class tourPartie {
-    private int ligne, colonne;
+    private int ligne, colonne; //du choix de la case ou se trouve la pièce que l'on souhaite deplacer
+    private int ligneDeplacFinal, colonneDeplacFinal;
 
     //Constructeur par défaut
     public tourPartie() {
-
+        this.ligne = -1;
+        this.colonne = -1;
+        this.ligneDeplacFinal = -1;
+        this.colonneDeplacFinal = -1;
     }
 
     //getteur de la ligne
@@ -18,6 +22,14 @@ public class tourPartie {
     //getteur de la colonne
     public int getColonne() {
         return this.colonne;
+    }
+
+    public void setLigneDeplacFinal(int ligneDeplacFinal) {
+        this.ligneDeplacFinal = ligneDeplacFinal;
+    }
+
+    public void setColonneDeplacFinal(int colonneDeplacFinal) {
+        this.colonneDeplacFinal = colonneDeplacFinal;
     }
 
     //Saisie de la ligne et de la colonne de la pièce qu'il veut bouger
