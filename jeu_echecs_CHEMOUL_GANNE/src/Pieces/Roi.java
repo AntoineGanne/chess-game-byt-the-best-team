@@ -13,8 +13,6 @@ public class Roi extends Piece{
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){
 
         LinkedList<Case> casesPossibles = new LinkedList<Case>();
-        System.out.println(x);
-        System.out.println(y);
         //Pour chaque possibilité : si le pion n'est pas de la même couleur ou si la case est vide
         if(x-1 >= 0 && y-1 >= 0){
             if((!tabJeu[x-1][y-1].estVide() && (tabJeu[x-1][y-1].getPiece().isEstBlanc() && !this.isEstBlanc()) || (!tabJeu[x-1][y-1].getPiece().isEstBlanc() && this.isEstBlanc())) || tabJeu[x-1][y-1].estVide())
@@ -59,6 +57,7 @@ public class Roi extends Piece{
             }
         }*/
 
+        //Ajouter Roque
 
 
 
