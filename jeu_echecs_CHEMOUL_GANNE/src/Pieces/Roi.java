@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Roi extends Piece{
 
     public Roi(boolean blanc){
-        super(blanc,"Roi");
+        super(blanc,"Roi","roiB.png","roiN.png");
     }
 
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){

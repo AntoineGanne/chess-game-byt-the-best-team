@@ -1,15 +1,12 @@
 package Jeu;
-import Pieces.Piece;
+import Pieces.*;
 
-import Pieces.Dame;
-import Pieces.Pion;
-import Pieces.Roi;
-import Pieces.Fou;
-import Pieces.Tour;
-import  Pieces.Cavalier;
+import Pieces.Cavalier;
 import com.sun.javafx.geom.Vec2d;
+import java.util.*;
 
 import java.util.LinkedList;
+import java.io.*;
 
 public class Plateau {
     private int taille;
@@ -48,77 +45,103 @@ public class Plateau {
                 tabCases[i][j] = new Case(i,j,null);
             }
         }
+    }
 
-                //Pieces blanches
-        Pion pion1B = new Pion(true);
-        Pion pion2B = new Pion(true);
-        Pion pion3B = new Pion(true);
-        Pion pion4B = new Pion(true);
-        Pion pion5B = new Pion(true);
-        Pion pion6B = new Pion(true);
-        Pion pion7B = new Pion(true);
-        Pion pion8B = new Pion(true);
-        tabCases[6][0] = new Case(6,0,pion1B);
-        tabCases[6][1] = new Case(6,1,pion2B);
-        tabCases[6][2] = new Case(6,2,pion3B);
-        tabCases[6][3] = new Case(6,3,pion4B);
-        tabCases[6][4] = new Case(6,4,pion5B);
-        tabCases[6][5] = new Case(6,5,pion6B);
-        tabCases[6][6] = new Case(6,6,pion7B);
-        tabCases[6][7] = new Case(6,7,pion8B);
-        Dame dameB = new Dame(true);
-        Roi roiB = new Roi(true);
-        Fou fou1B = new Fou(true);
-        Fou fou2B = new Fou(true);
-        Cavalier cavalier1B = new Cavalier(true);
-        Cavalier cavalier2B = new Cavalier(true);
-        Tour tour1B = new Tour(true);
-        Tour tour2B = new Tour(true);
-        tabCases[7][0] = new Case(7,0,tour1B);
-        tabCases[7][7] = new Case(7,7,tour2B);
-        tabCases[7][1] = new Case(7,1,cavalier1B);
-        tabCases[7][6] = new Case(7,6,cavalier2B);
-        tabCases[7][2] = new Case(7,2,fou1B);
-        tabCases[7][5] = new Case(7,5,fou2B);
-        tabCases[7][3] = new Case(7,3,roiB);
-        tabCases[7][4] = new Case(7,3,dameB);
+    public void demanderEtChargerFichier(){
+        String ligne = "";
+        String fichier = "";
+        String [] mot;
+        Scanner clavier = new Scanner(
+                System.in);
 
+        System.out.println("Quel est le nom de votre fichier de configuration ?");
+        fichier = clavier.nextLine();
+        BufferedReader ficTexte;
+        try {
+            ficTexte = new BufferedReader(new FileReader(new File(fichier)));
+            if (ficTexte == null) {
+                throw new FileNotFoundException("Fichier non trouvé : "
+                        + fichier);
+            }
+            ligne = ficTexte.readLine();
+            if (ligne != null) {
+                System.out.println(ligne);
+                mot = ligne.split (" ");
 
+                //traitement du chargement
+                boolean couleur = true;
+                String lettre = "";
+                String[] position;
+                int a;
+                int b;
 
-        //Pieces noires
-        Pion pion1N = new Pion(false);
-        Pion pion2N = new Pion(false);
-        Pion pion3N = new Pion(false);
-        Pion pion4N = new Pion(false);
-        Pion pion5N = new Pion(false);
-        Pion pion6N = new Pion(false);
-        Pion pion7N = new Pion(false);
-        Pion pion8N = new Pion(false);
-        tabCases[1][0] = new Case(1,0,pion1N);
-        tabCases[1][1] = new Case(1,1,pion2N);
-        tabCases[1][2] = new Case(1,2,pion3N);
-        tabCases[1][3] = new Case(1,3,pion4N);
-        tabCases[1][4] = new Case(1,4,pion5N);
-        tabCases[1][5] = new Case(1,5,pion6N);
-        tabCases[1][6] = new Case(1,6,pion7N);
-        tabCases[1][7] = new Case(1,7,pion8N);
-        Dame dameN = new Dame(false);
-        Roi roiN = new Roi(false);
-        Fou fou1N = new Fou(false);
-        Fou fou2N= new Fou(false);
-        Cavalier cavalier1N = new Cavalier(false);
-        Cavalier cavalier2N = new Cavalier(false);
-        Tour tour1N = new Tour(false);
-        Tour tour2N = new Tour(false);
-        tabCases[0][0] = new Case(0,0,tour1N);
-        tabCases[0][7] = new Case(0,7,tour2N);
-        tabCases[0][1] = new Case(0,1,cavalier1N);
-        tabCases[0][6] = new Case(0,6,cavalier2N);
-        tabCases[0][2] = new Case(0,2,fou1N);
-        tabCases[0][5] = new Case(0,5,fou2N);
-        tabCases[0][3] = new Case(0,3,roiN);
-        tabCases[0][4] = new Case(0,3,dameN);
+                boolean estPiece; //si on traite la pièce ou sa position
+                Pion pion;
+                Dame dame;
+                Roi roi;
+                Fou fou;
+                Cavalier cavalier;
+                Tour tour;
+                int i =0;
+                System.out.println(mot.length);
+                while(i<mot.length){
 
+                    if(mot[i].contains("white")){
+                        couleur=true;
+                        i++;
+                    }
+                    else if(mot[i].contains("black")){
+                        couleur=false;
+                        i++;
+                    }
+                    else{
+                        lettre = mot[i];
+                        position = mot[i+1].split("");
+                        if(position.length == 2){
+                            a= position[0].toCharArray()[0] - 'a';
+                            b = 8-Integer.parseInt(position[1]);
+
+                            if(lettre.contains("p")){ //pawn
+                                pion = new Pion(couleur);
+                                tabCases[b][a] = new Case(b,a, pion);
+                            }
+                            else if(lettre.contains("t")) //tower
+                            {
+                                tour = new Tour(couleur);
+                                tabCases[b][a] = new Case(b,a, tour);
+                            }
+                            else if(lettre.contains("q")) //queen
+                            {
+                                dame = new Dame(couleur);
+                                tabCases[b][a] = new Case(b,a, dame);
+                            }
+                            else if(lettre.contains("b")) //bishop
+                            {
+                                fou = new Fou(couleur);
+                                tabCases[b][a] = new Case(b,a, fou);
+                            }
+                            else if(lettre.contains("k1") || lettre.contains("k2")) //knight
+                            {
+                                cavalier = new Cavalier(couleur);
+                                tabCases[b][a] = new Case(b,a, cavalier);
+                            }
+                            else //king
+                            {
+                                roi = new Roi(couleur);
+                                tabCases[b][a] = new Case(b,a, roi);
+                            }
+                        }
+                        i=i+2;
+                    }
+
+                }
+                }
+            ficTexte.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -126,10 +149,10 @@ public class Plateau {
      */
     public void affichageConsole(){
         String couleur;
-        System.out.println("  | 1  2  3  4  5  6  7  8");
+        System.out.println("  | A  B  C  D  E  F  G  H");
         System.out.println("___________________________");
         for(int i = 0;i<taille;i++){
-            System.out.print(i+1 + " | ");
+            System.out.print(8-i + " | ");
             for(int j=0; j<taille; j++){
                 if(tabCases[i][j].getPiece() == null)
                     System.out.print("__");
@@ -211,7 +234,7 @@ public class Plateau {
 
         //On crée temporairement une case qui contient touts les paramètres de notre roi blanc
         Roi roiB = new Roi(blanc); //la pièce
-        Case temporaireRoi = new Case(x,y,roiB);
+        Case temporaireRoi = new Case(x,y, roiB);
 
         for(int i =0; i<8;i++){
             for(int j =0; j<8;j++){
@@ -263,5 +286,63 @@ public class Plateau {
             }
         }
         return position;
+    }
+
+    public void pionPromotion(int x, int y){
+        System.out.println("PROMOTION POSSIBLE ! Votre pion est arrivé a la dernière rangée !");
+        System.out.println("Vous voulez promouvoir votre pion en :");
+        System.out.println("1 = Dame");
+        System.out.println("2 = Four");
+        System.out.println("3 = Tour");
+        System.out.println("4 = Cavalier");
+        System.out.println("5 = Aucun de cas ci-contre.");
+        int choix = 0;
+        boolean isEntier = false;
+        boolean couleur;
+        if(tabCases[x][y].getPiece() != null && tabCases[x][y].getPiece().isEstBlanc())
+            couleur = true;
+        else
+            couleur = false;
+
+        //Choix de la promotion
+        while(choix > 5 || choix < 1) {
+            do { //boucle pour tester si le joueur a bien saisie un nombre
+                System.out.print("Veuillez saisir le numéro d'une des possibilités.");
+                isEntier = true;
+                Scanner scanner = new Scanner(System.in);
+                try{
+                    choix = scanner.nextInt();
+                } catch (InputMismatchException e)
+                {
+                    System.out.println("La valeur saisie n'est pas un entier");
+                    isEntier = false;
+                }
+                scanner.close();
+            } while (isEntier != true);
+        }
+
+        //Promotion
+        switch (choix){
+            case(1):
+                Dame dame = new Dame(couleur);
+                tabCases[x][y].setPiece(dame);
+                break;
+            case(2):
+                Fou fou = new Fou(couleur);
+                tabCases[x][y].setPiece(fou);
+                break;
+            case(3):
+                Tour tour = new Tour(couleur);
+                tabCases[x][y].setPiece(tour);
+                break;
+            case(4):
+                Cavalier cavalier = new Cavalier(couleur);
+                tabCases[x][y].setPiece(cavalier);
+                break;
+            case(5):
+                break;
+        }
+
+
     }
 }

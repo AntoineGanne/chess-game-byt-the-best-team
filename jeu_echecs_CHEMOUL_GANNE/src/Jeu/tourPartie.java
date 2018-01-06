@@ -5,8 +5,11 @@ import java.util.*;
 public class tourPartie {
     private int ligne, colonne; //du choix de la case ou se trouve la pièce que l'on souhaite deplacer
     private int ligneDeplacFinal, colonneDeplacFinal;
+    //permettent de stocker le déplacement effectué (pour d'eventuelles statistiques)
 
-    //Constructeur par défaut
+    /**
+     * Constructeur par défaut
+     */
     public tourPartie() {
         this.ligne = -1;
         this.colonne = -1;
@@ -14,20 +17,30 @@ public class tourPartie {
         this.colonneDeplacFinal = -1;
     }
 
-    //getteur de la ligne
+    /**
+     * getteur de la ligne
+     */
     public int getLigne() {
         return this.ligne;
     }
 
-    //getteur de la colonne
+    /**
+     * getteur de la colonne
+     */
     public int getColonne() {
         return this.colonne;
     }
 
+    /**
+     * Met à jour la ligne du déplacement choisi
+     */
     public void setLigneDeplacFinal(int ligneDeplacFinal) {
         this.ligneDeplacFinal = ligneDeplacFinal;
     }
 
+    /**
+     * Met à jour la colonne du déplacement choisi
+     */
     public void setColonneDeplacFinal(int colonneDeplacFinal) {
         this.colonneDeplacFinal = colonneDeplacFinal;
     }
@@ -40,7 +53,7 @@ public class tourPartie {
 
         while(l > 8 || l < 0) {
             do { //boucle pour tester si le joueur a bien saisie un nombre
-                System.out.print("Veuillez saisir la ligne : ");
+                System.out.print("Veuillez saisir le numéro de la ligne : ");
                 isEntier = true;
                 Scanner s = new Scanner(System.in);
                 try{
@@ -52,24 +65,35 @@ public class tourPartie {
                 }
             } while (isEntier != true);
         }
-        this.ligne = l - 1;
+        this.ligne = 8 - l; //sur le palteau les lignes sont numerotées de 8 a 1 et non 0 a 7
 
-        isEntier = true;
+        boolean isLettre = true;
+        String lettre = "";
         while(c > 8 || c < 0) {
             do { //boucle pour tester si le joueur a bien saisie un nombre
                 System.out.print("Veuillez saisir la colonne : ");
-                isEntier = true;
+                isLettre = true;
                 Scanner s2 = new Scanner(System.in);
                 try{
-                    c = s2.nextInt();
+                    lettre = s2.nextLine();
                 } catch (InputMismatchException e)
                 {
-                    System.out.println("La valeur saisie n'est pas un entier");
-                    isEntier = false;
+                    System.out.println("La valeur saisie n'est pas une lettre");
+                    isLettre = false;
                 }
-            } while (isEntier != true);
+            } while (isLettre != true);
+            c = lettre.toLowerCase().toCharArray()[0] - 'a' +1;
         }
 
         this.colonne = c - 1;
+    }
+
+    public void choixIA(){
+        int l;
+        int c;
+        l = (int)(Math.random()*7 + 1);
+        c = (int)(Math.random()*7 + 1);
+        this.ligne = l;
+        this.colonne = c;
     }
 }

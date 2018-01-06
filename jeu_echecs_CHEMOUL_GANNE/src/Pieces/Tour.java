@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Tour extends Piece{
 
     public Tour(boolean blanc){
-        super(blanc,"tour");
+        super(blanc,"tour","tourB.png","tourN.png");
     }
 
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){

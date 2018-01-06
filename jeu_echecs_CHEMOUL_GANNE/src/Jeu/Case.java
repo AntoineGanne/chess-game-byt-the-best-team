@@ -62,19 +62,33 @@ public class Case {
         this.piece = piece;
     }
 
+    /**
+     *
+     * @param tabJeu
+     * @return Liste des Cases possibles de déplacement selon la case courante
+     */
     public LinkedList<Case> afficherPossibilites(Case[][] tabJeu){
         LinkedList<Case> poss;
+        int a;
+        char lettre;
         poss = this.piece.afficherPossibilitees(this.x,this.y, tabJeu);
         if(poss.size() != 0) {
             System.out.println("Possibilitées de déplacement");
             for(int i = 0; i<poss.size();i++){
-                if(poss.get(i)!=null)
-                    System.out.println("Coordonnées : " +(poss.get(i).getX()+1) + "  " + (poss.get(i).getY()+1));
+                if(poss.get(i)!=null){
+                    a = poss.get(i).getY()+1;
+                    lettre = (char) (a + 'a' -1);
+                    System.out.println("Coordonnées : " +(8 - poss.get(i).getX()) + "  " + lettre);
+                }
             }
         }
         return poss;
     }
 
+    /**
+     *
+     * @return vrai si la case est vide (si elle ne contient pas de pièce)
+     */
     public boolean estVide(){
         return (this.piece == null ||  this.piece.isEstMange() ); //ou l'ancienne piece a été mangée ou la case est vide
     }
