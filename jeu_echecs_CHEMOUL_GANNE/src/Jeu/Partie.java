@@ -43,13 +43,15 @@ public class Partie {
                blanc = true;
                joueurActuel = 0;
            }
-           else
+           else{
+               blanc =false;
                joueurActuel = 1;
+           }
+
 
            //TEST ECHEC
-           /*Vec2d position = plateauJeu.positionRoi(blanc);
-           if(plateauJeu.estEnEchec((int) position.x, (int) position.y,blanc))
-                System.out.println("Le Roi "+ ((blanc)? "blanc":"noir")+" est en ECHEC");*/
+           if(plateauJeu.estEnEchec(blanc))
+                System.out.println("Le Roi "+ ((blanc)? "blanc":"noir")+" est en ECHEC");
 
            //TEST FIN DE PARTIE
            if(this.estFinie()){
@@ -61,7 +63,7 @@ public class Partie {
 
     /**
      * Dans cette fonction, le joueur choisie la case sur lauqelle se trouvela pièce qu'il souhaite déplacer.
-     * Il chosiit ensuite parmi les possibilités liées à cette pièce, celle qu'il préfère.
+     * Il choizit ensuite parmi les possibilités liées à cette pièce, celle qu'il préfère.
      */
     public void choixPieceEtDeplacement(){
         //CHOIX D'UNE PIECE A DEPLACER ET AFFICHAGE DES POSSIBILITES DE DEPLACEMENT
@@ -122,7 +124,8 @@ public class Partie {
                 t.choixIA();
                 x = t.getLigne();
                 y = t.getColonne();
-                piece = new Piece(this.plateauJeu.getTabCases()[x][y].getPiece());
+                //piece = new Piece(this.plateauJeu.getTabCases()[x][y].getPiece());
+                piece = this.plateauJeu.getTabCases()[x][y].getPiece();
             }
             while ((piece == null) || !((piece.isEstBlanc() && joueurActuel == 0) || (!piece.isEstBlanc() && joueurActuel == 1)));
             possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());

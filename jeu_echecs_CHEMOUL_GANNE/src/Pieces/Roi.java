@@ -14,6 +14,7 @@ public class Roi extends Piece{
 
         LinkedList<Case> casesPossibles = new LinkedList<Case>();
         //Pour chaque possibilité : si le pion n'est pas de la même couleur ou si la case est vide
+        /*
         if(x-1 >= 0 && y-1 >= 0){
             if((!tabJeu[x-1][y-1].estVide() && (tabJeu[x-1][y-1].getPiece().isEstBlanc() && !this.isEstBlanc()) || (!tabJeu[x-1][y-1].getPiece().isEstBlanc() && this.isEstBlanc())) || tabJeu[x-1][y-1].estVide())
                 casesPossibles.add(tabJeu[x-1][y-1]);
@@ -47,15 +48,20 @@ public class Roi extends Piece{
             if((!tabJeu[x+1][y-1].estVide() && ((tabJeu[x+1][y-1].getPiece().isEstBlanc() && !this.isEstBlanc()) || (!tabJeu[x+1][y-1].getPiece().isEstBlanc() && this.isEstBlanc())) || tabJeu[x+1][y-1].estVide()))
                 casesPossibles.add(tabJeu[x+1][y-1]);
         }
+        */
 
-        /*for(int i = -1;i<=1;i++){
-            for(int j=-1;j<=1;j++){
-                if(x-i >=0 && y-i >=0 && y-i<=7 && x-i<=7){
-                    if((!tabJeu[x-i][y-i].estVide() && ((tabJeu[x-i][y-i].getPiece().isEstBlanc() && !this.isEstBlanc()) || (!tabJeu[x-i][y-i].getPiece().isEstBlanc() && this.isEstBlanc())) || tabJeu[x-i][y-i].estVide()))
-                        casesPossibles.add(tabJeu[x-i][y-i]);
+
+        for(int i = x-1;i<=x+1;i++){
+            for(int j=y-1;j<=y+1;j++){
+                //attention aux magic numbers: remplacer 8 par ~~ tabJeu.length ?
+                if(i >=0 && j >=0 && i<8 && j<8 && !(i==x && j==y)){
+                    //si le pion n'est pas de la même couleur ou si la case est vide
+                    if((!tabJeu[i][j].estVide() && ((tabJeu[i][j].getPiece().isEstBlanc() && !this.isEstBlanc()) || (!tabJeu[i][j].getPiece().isEstBlanc() && this.isEstBlanc())) || tabJeu[i][j].estVide()))
+                        casesPossibles.add(tabJeu[i][j]);
                 }
             }
-        }*/
+        }
+
 
         //Ajouter Roque
 

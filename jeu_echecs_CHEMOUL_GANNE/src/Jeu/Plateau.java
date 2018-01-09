@@ -54,8 +54,9 @@ public class Plateau {
         Scanner clavier = new Scanner(
                 System.in);
 
-        System.out.println("Quel est le nom de votre fichier de configuration ?");
+        System.out.println("Quel est le nom de votre fichier de configuration ? (tapez enter pour la config de base");
         fichier = clavier.nextLine();
+        if(fichier.equals("")) fichier="c.txt";//"configBase.txt";
         BufferedReader ficTexte;
         try {
             ficTexte = new BufferedReader(new FileReader(new File(fichier)));
@@ -83,7 +84,7 @@ public class Plateau {
                 Cavalier cavalier;
                 Tour tour;
                 int i =0;
-                System.out.println(mot.length);
+                //System.out.println(mot.length);
                 while(i<mot.length){
 
                     if(mot[i].contains("white")){
@@ -226,25 +227,29 @@ public class Plateau {
      * @param x
      * @param y
      * @param blanc
-     * @return vrai si le roi de la couleur donnée est en echec
+     * @return vrai si le roi de la couleur donnée est en echec a la position (x,y) donnée
      */
     public boolean estEnEchec(int x, int y, boolean blanc){ //on pourra saisir les coordonnées des déplacement possibles du roi pour tester si il est en echec et mat
 
         LinkedList<Case> casesPossibles = new LinkedList<>();
 
-        //On crée temporairement une case qui contient touts les paramètres de notre roi blanc
-        Roi roiB = new Roi(blanc); //la pièce
-        Case temporaireRoi = new Case(x,y, roiB);
-
         for(int i =0; i<8;i++){
             for(int j =0; j<8;j++){
+                // on s'intéresse aux pièces adverses (noires si blanc==true, blanches sinon)
                 if((tabCases[i][j].getPiece() != null) && (blanc ? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
                     casesPossibles.clear();
                     casesPossibles = tabCases[i][j].getPiece().afficherPossibilitees(i,j,tabCases);
 
-                    if(casesPossibles.contains(temporaireRoi)){
+                    /*if(casesPossibles.contains(caseRoi)){
                         //si l'une des pièces de l'adversaire peut manger le roi
                         return true;
+                    }*/
+                    for(Case c:casesPossibles){
+                        //si l'une des cases possibles pour l'adversaire est la position (x,y) donné alors cette position est un échec
+                        if(c.getX()==x && c.getY()==y) {
+                            return true;
+                        }
+
                     }
                 }
             }
@@ -255,10 +260,32 @@ public class Plateau {
     /**
      *
      * @param blanc
+     * @return vrai si le roi de la couleur donnée est en echec
+     */
+    public boolean estEnEchec(boolean blanc){
+        Vec2d posRoi=positionRoi(blanc);
+        return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
+    }
+
+
+
+    /**
+     *
+     * @param blanc
      * @return vrai si le roi de la couleur donnée est en echec et mat
      */
     public boolean estEnEchecEtMat(boolean blanc){
         Vec2d position = this.positionRoi(blanc);
+        boolean resultat =true;
+        for(int i=(int)position.x-1;i<=(int)position.x+1;++i){
+            for(int j=(int)position.y-1;j<=(int)position.y+1;++j){
+                //on verifie que estEnEchec renvoit vrai pour tous les deplacements possibles du roi
+                resultat = resultat && this.estEnEchec(i,j,blanc);
+            }
+        }
+
+        return resultat;
+        /*
         return estEnEchec((int)position.x+1,(int) position.y+1,blanc)
              && estEnEchec((int)position.x,(int) position.y+1,blanc)
              && estEnEchec((int)position.x-1,(int) position.y+1,blanc)
@@ -267,19 +294,20 @@ public class Plateau {
              && estEnEchec((int)position.x+1,(int) position.y-1,blanc)
              && estEnEchec((int)position.x,(int) position.y-1,blanc)
              && estEnEchec((int)position.x-1,(int) position.y-1,blanc);
+        */
     }
 
 
     /**
      *
      * @param blanc
-     * @return un vecteur 2D contenant la position du Roi sur l eplateau de jeu
+     * @return un vecteur 2D contenant la position du Roi (de la couleur précisée par le boolean blanc) sur le plateau de jeu
      */
     public Vec2d positionRoi(boolean blanc){
         Vec2d position = new Vec2d(-1,-1);
         for(int i =0; i<8;i++){
             for(int j =0; j<8;j++){
-                if(tabCases[i][j].getPiece()!= null && tabCases[i][j].getPiece().getNom()=="Roi" && (blanc ? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
+                if(tabCases[i][j].getPiece()!= null && Objects.equals(tabCases[i][j].getPiece().getNom(), "Roi") && (blanc ? tabCases[i][j].getPiece().isEstBlanc():!tabCases[i][j].getPiece().isEstBlanc())){
                     position = new Vec2d(i,j);
                     return position;
                 }
