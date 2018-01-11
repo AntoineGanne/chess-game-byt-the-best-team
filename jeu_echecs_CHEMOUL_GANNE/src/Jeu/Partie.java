@@ -2,8 +2,6 @@ package Jeu;
 
 import java.util.*;
 import Pieces.Piece;
-import com.sun.javafx.geom.Vec2d;
-
 
 public class Partie {
     private Joueur j1;
@@ -27,6 +25,9 @@ public class Partie {
      */
     public void moteurPartie(){
         initPartie();
+        /*if(this.estEnEchecEtMatPartie()){
+            finie = true;
+        }*/
         while(!this.finie) {
            afficherPartie();
            if(intelligenceArtificielle) {
@@ -38,26 +39,16 @@ public class Partie {
                choixPieceEtDeplacement();
            }
            //CHANGEMENT DU JOUEUR
-           boolean blanc = false;
-           if (joueurActuel == 1){
-               blanc = true;
-               joueurActuel = 0;
-           }
-           else{
-               blanc =false;
-               joueurActuel = 1;
-           }
-
+           boolean blanc = (joueurActuel == 1)? true:false;
+           joueurActuel =  (joueurActuel == 1)? 0:1;
 
            //TEST ECHEC
            if(plateauJeu.estEnEchec(blanc))
                 System.out.println("Le Roi "+ ((blanc)? "blanc":"noir")+" est en ECHEC");
 
            //TEST FIN DE PARTIE
-           if(this.estFinie()){
+           if(this.estFinie())
                finie = true;
-           }
-
        }
     }
 
@@ -77,13 +68,13 @@ public class Partie {
                 x = t.getLigne();
                 y = t.getColonne();
             }//la pièce choisie appartient bien au joueur et n'est pas null
-            while ((this.plateauJeu.getTabCases()[x][y].getPiece() == null) || !((this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 0) || (!this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc() && joueurActuel == 1)));
+            while ((this.plateauJeu.getTabCases()[x][y].getPiece() == null) || (joueurActuel == 0)? !this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc():this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc());
             possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
         }
         while(possibilites.size() == 0); //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
 
         //CHOIX DU DEPLACEMENT PARMI LES POSSIBILITES
-        System.out.println("Saisissez la possibilité que vous souhaitez appliquer");
+        System.out.println("Saisissez le numéro de la possibilité que vous souhaitez appliquer");
         Scanner sc = new Scanner(System.in);
         int a = sc.nextInt();
         while (a > possibilites.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
@@ -92,7 +83,8 @@ public class Partie {
         }
 
         //GESTION DU DEPLACEMENT
-        System.out.println("Vous deplacez votre " + this.plateauJeu.getTabCases()[x][y].getPiece().getNom() + ".");
+        String nom = this.plateauJeu.getTabCases()[x][y].getPiece().getNom();
+        System.out.println("Vous deplacez votre " + nom + ".");
         int xFinal = possibilites.get(a-1).getX(); // a-1 car le joueur saisi entre [1,8] et non [0,7]
         int yFinal = possibilites.get(a-1).getY();
         t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au tourPartie
@@ -103,8 +95,8 @@ public class Partie {
         this.listeTourParties.add(t);
         //----------------------------------
         //Test promotion
-        //if(derniereLigne())
-        //    this.plateauJeu.pionPromotion(xFinal,yFinal);
+        if(derniereLigne(xFinal) && nom.contains("Pion"))
+            this.plateauJeu.pionPromotion(xFinal,yFinal);
         //----------------------------------
     }
 
@@ -124,7 +116,6 @@ public class Partie {
                 t.choixIA();
                 x = t.getLigne();
                 y = t.getColonne();
-                //piece = new Piece(this.plateauJeu.getTabCases()[x][y].getPiece());
                 piece = this.plateauJeu.getTabCases()[x][y].getPiece();
             }
             while ((piece == null) || !((piece.isEstBlanc() && joueurActuel == 0) || (!piece.isEstBlanc() && joueurActuel == 1)));
@@ -160,16 +151,22 @@ public class Partie {
         intelligenceartficielle();
     }
 
+    public boolean derniereLigne(int x){
+        boolean blanc = (joueurActuel == 0)? true:false;
+        if(blanc)
+            return x==0;
+        else
+            return x==7;
+    }
+
     /**
      * Affiche l'état de la partie: tour, joueurs, grille
      */
     public void afficherPartie() {
         System.out.println(j1.getPseudo() + ": Blanc  " + j2.getPseudo() + ": Noir");
         System.out.println("Tour " + (this.listeTourParties.size()+1) +" :");
-        if(this.joueurActuel == 0)
-            System.out.println("C'est a " + j1.getPseudo() + " de jouer.");
-        else
-            System.out.println("C'est a " + j2.getPseudo() + " de jouer.");
+        String pseudo = (joueurActuel == 0)? j1.getPseudo():j2.getPseudo();
+        System.out.println("C'est a " + pseudo + " de jouer.");
         plateauJeu.affichageConsole();
     }
 
@@ -178,18 +175,6 @@ public class Partie {
      * @return vrai si la partie est finie
      */
     public boolean estFinie(){
-        /*if(this.plateauJeu.estEnEchecEtMat(true))
-        {
-            System.out.println("Le Roi Blanc est en ECHEC ET MAT");
-            System.out.println("Les Noirs ont gagnés ! Bravo !");
-            return true;
-        }
-        if(this.plateauJeu.estEnEchecEtMat(false))
-        {
-            System.out.println("Le Roi Noir est en ECHEC ET MAT");
-            System.out.println("Les Blancs ont gagnés ! Bravo !");
-            return true;
-        }*/
         if(this.plateauJeu.isRoiBlancMort()){
             //afichage gagnant
             System.out.println("Les Noirs ont gagnés ! Bravo !");
@@ -200,6 +185,24 @@ public class Partie {
             //afichage gagnant
             return true;
         }
+        if(estEnEchecEtMatPartie())
+            return true;
+        return false;
+    }
+
+    public boolean estEnEchecEtMatPartie(){
+        if(this.plateauJeu.estEnEchecEtMat(true))
+        {
+            System.out.println("Le Roi Blanc est en ECHEC ET MAT");
+            System.out.println("Les Noirs ont gagnés ! Bravo !");
+            return true;
+        }
+        /*if(this.plateauJeu.estEnEchecEtMat(false))
+        {
+            System.out.println("Le Roi Noir est en ECHEC ET MAT");
+            System.out.println("Les Blancs ont gagnés ! Bravo !");
+            return true;
+        }*/
         return false;
     }
 
@@ -209,7 +212,7 @@ public class Partie {
     public void intelligenceartficielle(){
         int tmp = -1;
         boolean isEntier = true;
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner;
         do{
             System.out.println("Voulez vous jouer contre l'intelligence artificielle ? (1 = oui, 0 = non)");
             try{
@@ -226,6 +229,5 @@ public class Partie {
             this.intelligenceArtificielle = true;
         else
             this.intelligenceArtificielle = false;
-
     }
 }

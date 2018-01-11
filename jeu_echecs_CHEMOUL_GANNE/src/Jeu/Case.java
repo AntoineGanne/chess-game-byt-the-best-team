@@ -21,7 +21,7 @@ public class Case {
     public Case(Case case1){
         this.x = case1.x;
         this.y = case1.y;
-        this.piece = case1.piece;
+        this.piece = (case1.piece != null)? new Piece(case1.piece):null;
     }
 
     /**
@@ -78,7 +78,7 @@ public class Case {
                 if(poss.get(i)!=null){
                     a = poss.get(i).getY()+1;
                     lettre = (char) (a + 'a' -1);
-                    System.out.println("Coordonnées : " +(8 - poss.get(i).getX()) + "  " + lettre);
+                    System.out.println((i + 1) + ") Coordonnées : " +(8 - poss.get(i).getX()) + "  " + lettre);
                 }
             }
         }

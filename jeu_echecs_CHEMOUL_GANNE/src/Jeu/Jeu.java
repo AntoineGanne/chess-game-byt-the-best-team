@@ -6,7 +6,5 @@ public class Jeu {
         System.out.println("Bienvenue dans le jeu d'echec !");
         Partie partie = new Partie();
         partie.moteurPartie();
-
-
     }
 }

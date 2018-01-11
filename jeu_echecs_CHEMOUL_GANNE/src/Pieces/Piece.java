@@ -3,7 +3,7 @@ import Jeu.Case;
 
 import java.util.LinkedList;
 
-public class Piece {
+public class Piece{
     private String nom;
     private boolean estBlanc;
     private boolean estMange;
@@ -21,6 +21,7 @@ public class Piece {
         this.imageB = imageB;
         this.imageN = imageN;
     }
+
     public Piece(Piece piece) {
         this.nom = piece.nom;
         this.estBlanc = piece.estBlanc;
@@ -55,5 +56,4 @@ public class Piece {
         LinkedList<Case> casesPossibles = new LinkedList<Case>();
         return casesPossibles;
     }
-
 }

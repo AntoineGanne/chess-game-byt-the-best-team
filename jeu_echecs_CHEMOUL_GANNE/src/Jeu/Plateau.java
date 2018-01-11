@@ -9,19 +9,39 @@ import java.util.LinkedList;
 import java.io.*;
 
 public class Plateau {
-    private int taille;
+    private final int TAILLE;
     private Case[][] tabCases;
     private boolean roiBlancMort;
     private boolean roiNoirMort;
     private int compteurToursSansPrises; //La partie est finie si 50 coups sans prises ont été joués à la suite
 
     public Plateau(int taille) {
-        this.taille = taille;
+        this.TAILLE = taille;
         this.tabCases = new Case[taille][taille];
         this.initialiserPlateau();
         this.roiBlancMort = false;
         this.roiNoirMort = false;
         this.compteurToursSansPrises = 0;
+    }
+
+    public Plateau(Plateau p) {
+        this.TAILLE = p.getTAILLE();
+        this.tabCases = new Case[p.getTAILLE()][p.getTAILLE()];
+        for(int i = 0; i<TAILLE; i++){
+            for(int j=0;j<TAILLE;j++)
+                this.tabCases[i][j] = new Case(p.getTabCases()[i][j]);
+        }
+        this.roiBlancMort = p.isRoiBlancMort();
+        this.roiNoirMort = p.isRoiNoirMort();
+        this.compteurToursSansPrises = p.getCompteurToursSansPrises();
+    }
+
+    public int getTAILLE() {
+        return TAILLE;
+    }
+
+    public int getCompteurToursSansPrises() {
+        return compteurToursSansPrises;
     }
 
     public Case[][] getTabCases() {
@@ -40,8 +60,8 @@ public class Plateau {
      * On crée toutes les pièces du jeu d'echec et on les initialises sur le plateau de jeu.
      */
     public void initialiserPlateau(){
-        for(int i = 0;i<taille;i++) {
-            for (int j = 0; j < taille; j++) {
+        for(int i = 0;i<TAILLE;i++) {
+            for (int j = 0; j < TAILLE; j++) {
                 tabCases[i][j] = new Case(i,j,null);
             }
         }
@@ -54,7 +74,7 @@ public class Plateau {
         Scanner clavier = new Scanner(
                 System.in);
 
-        System.out.println("Quel est le nom de votre fichier de configuration ? (tapez enter pour la config de base");
+        System.out.println("Quel est le nom de votre fichier de configuration ? (tapez enter pour la configuration de base)");
         fichier = clavier.nextLine();
         if(fichier.equals("")) fichier="c.txt";//"configBase.txt";
         BufferedReader ficTexte;
@@ -66,7 +86,6 @@ public class Plateau {
             }
             ligne = ficTexte.readLine();
             if (ligne != null) {
-                System.out.println(ligne);
                 mot = ligne.split (" ");
 
                 //traitement du chargement
@@ -84,7 +103,6 @@ public class Plateau {
                 Cavalier cavalier;
                 Tour tour;
                 int i =0;
-                //System.out.println(mot.length);
                 while(i<mot.length){
 
                     if(mot[i].contains("white")){
@@ -134,7 +152,6 @@ public class Plateau {
                         }
                         i=i+2;
                     }
-
                 }
                 }
             ficTexte.close();
@@ -152,9 +169,9 @@ public class Plateau {
         String couleur;
         System.out.println("  | A  B  C  D  E  F  G  H");
         System.out.println("___________________________");
-        for(int i = 0;i<taille;i++){
+        for(int i = 0;i<TAILLE;i++){
             System.out.print(8-i + " | ");
-            for(int j=0; j<taille; j++){
+            for(int j=0; j<TAILLE; j++){
                 if(tabCases[i][j].getPiece() == null)
                     System.out.print("__");
                 else{
@@ -207,7 +224,7 @@ public class Plateau {
     public void deplacerPiecePlateau(Case caseADeplacer, int xFinal, int yFinal){
         if(tabCases[xFinal][yFinal].getPiece()!= null) { //si la case du déplacement n'est pas vide
             System.out.println("Vous avez mangé une pièce de l'adversaire : " + tabCases[xFinal][yFinal].getPiece().getNom() + ".");
-            this.compteurToursSansPrises = 0; //Une pièce a été mangée on remet le compteur à 0.
+            //this.compteurToursSansPrises = 0; //Une pièce a été mangée on remet le compteur à 0.
             tabCases[xFinal][yFinal].getPiece().setEstMange(true); //la pièce de la case est mangée
             //On regarde si c'est le Roi d'une des couleurs qui est mort
             if(tabCases[xFinal][yFinal].getPiece().getNom() == "Roi"){
@@ -222,6 +239,17 @@ public class Plateau {
         caseADeplacer.setPiece(null); //l'ancienne case n'a plus de pièce
     }
 
+    public boolean simulationDeplacement(Case caseADeplacer, int xFinal, int yFinal, boolean blanc){
+        Plateau plateauTemp = new Plateau(this);
+        int a = caseADeplacer.getX();
+        int b = caseADeplacer.getY();
+
+        //On effectue le déplacement
+        plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
+        plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
+
+        return plateauTemp.estEnEchec(xFinal,yFinal,blanc);
+    }
     /**
      *
      * @param x
@@ -230,26 +258,18 @@ public class Plateau {
      * @return vrai si le roi de la couleur donnée est en echec a la position (x,y) donnée
      */
     public boolean estEnEchec(int x, int y, boolean blanc){ //on pourra saisir les coordonnées des déplacement possibles du roi pour tester si il est en echec et mat
-
         LinkedList<Case> casesPossibles = new LinkedList<>();
-
-        for(int i =0; i<8;i++){
-            for(int j =0; j<8;j++){
-                // on s'intéresse aux pièces adverses (noires si blanc==true, blanches sinon)
+        for(int i =0; i<TAILLE;i++){
+            for(int j =0; j<TAILLE;j++){
+                // on s'intéresse aux pièces adverses
                 if((tabCases[i][j].getPiece() != null) && (blanc ? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
                     casesPossibles.clear();
                     casesPossibles = tabCases[i][j].getPiece().afficherPossibilitees(i,j,tabCases);
-
-                    /*if(casesPossibles.contains(caseRoi)){
-                        //si l'une des pièces de l'adversaire peut manger le roi
-                        return true;
-                    }*/
                     for(Case c:casesPossibles){
-                        //si l'une des cases possibles pour l'adversaire est la position (x,y) donné alors cette position est un échec
+                        //si l'une des cases possibles pour l'adversaire est la position (x,y) donnée alors cette position est un échec
                         if(c.getX()==x && c.getY()==y) {
                             return true;
                         }
-
                     }
                 }
             }
@@ -274,29 +294,26 @@ public class Plateau {
      * @param blanc
      * @return vrai si le roi de la couleur donnée est en echec et mat
      */
-    public boolean estEnEchecEtMat(boolean blanc){
-        Vec2d position = this.positionRoi(blanc);
-        boolean resultat =true;
-        for(int i=(int)position.x-1;i<=(int)position.x+1;++i){
-            for(int j=(int)position.y-1;j<=(int)position.y+1;++j){
-                //on verifie que estEnEchec renvoit vrai pour tous les deplacements possibles du roi
-                resultat = resultat && this.estEnEchec(i,j,blanc);
+    public boolean estEnEchecEtMat(boolean blanc) {
+        if (estEnEchec(blanc)) { //si le Roi est en echec on peut verifier si il est en echec et mat
+            Vec2d position = positionRoi(blanc);
+            if (position != null) {
+                int a = (int) position.x;
+                int b = (int) position.y;
+
+                boolean resultat = true;
+                for (int i = a - 1; i <= a + 1; ++i) {
+                    for (int j = b - 1; j <= b + 1; ++j) {
+                        if (i >= 0 && i < TAILLE && j >= 0 && j < TAILLE) {
+                            resultat = resultat && this.simulationDeplacement(this.tabCases[a][b], i, j, blanc);
+                        }
+                    }
+                }
+                return resultat;
             }
         }
-
-        return resultat;
-        /*
-        return estEnEchec((int)position.x+1,(int) position.y+1,blanc)
-             && estEnEchec((int)position.x,(int) position.y+1,blanc)
-             && estEnEchec((int)position.x-1,(int) position.y+1,blanc)
-             && estEnEchec((int)position.x+1,(int) position.y,blanc)
-             && estEnEchec((int)position.x-1,(int) position.y,blanc)
-             && estEnEchec((int)position.x+1,(int) position.y-1,blanc)
-             && estEnEchec((int)position.x,(int) position.y-1,blanc)
-             && estEnEchec((int)position.x-1,(int) position.y-1,blanc);
-        */
+        return false;
     }
-
 
     /**
      *
@@ -304,9 +321,9 @@ public class Plateau {
      * @return un vecteur 2D contenant la position du Roi (de la couleur précisée par le boolean blanc) sur le plateau de jeu
      */
     public Vec2d positionRoi(boolean blanc){
-        Vec2d position = new Vec2d(-1,-1);
-        for(int i =0; i<8;i++){
-            for(int j =0; j<8;j++){
+        Vec2d position = null;
+        for(int i =0; i<TAILLE;i++){
+            for(int j =0; j<TAILLE;j++){
                 if(tabCases[i][j].getPiece()!= null && Objects.equals(tabCases[i][j].getPiece().getNom(), "Roi") && (blanc ? tabCases[i][j].getPiece().isEstBlanc():!tabCases[i][j].getPiece().isEstBlanc())){
                     position = new Vec2d(i,j);
                     return position;
@@ -345,7 +362,6 @@ public class Plateau {
                     System.out.println("La valeur saisie n'est pas un entier");
                     isEntier = false;
                 }
-                scanner.close();
             } while (isEntier != true);
         }
 
@@ -370,7 +386,5 @@ public class Plateau {
             case(5):
                 break;
         }
-
-
     }
 }

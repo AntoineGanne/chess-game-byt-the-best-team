@@ -10,6 +10,7 @@ public class Pion extends Piece {
         super(blanc,"Pion","pionB.png","pionN.png");
     }
 
+    @Override
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){
 
         LinkedList<Case> casesPossibles = new LinkedList<>();
@@ -35,7 +36,6 @@ public class Pion extends Piece {
             casesPossibles.add(tabJeu[x+1][y-1]);
         if(!this.isEstBlanc() && x+1 <= 7 && y+1 <= 7 && !tabJeu[x+1][y+1].estVide() && tabJeu[x+1][y+1].getPiece().isEstBlanc())
             casesPossibles.add(tabJeu[x+1][y+1]);
-
         return casesPossibles;
     }
 }

@@ -15,15 +15,6 @@ public class Cavalier extends Piece {
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){
 
         LinkedList<Case> casesPossibles = new LinkedList<Case>();
-        //Dans le meilleur des cas 8 possibilités
-        // [x-2][y-1]
-        // [x-1][y-2]
-        // [x+1][y-1]
-        // [x+2][y-1]
-        // [x-2][y+1]
-        // [x-1][y+2]
-        // [x+2][y+1]
-        // [x+1][y+2]
         if(x-2 >= 0 && y-1 >= 0 && (tabJeu[x-2][y-1].estVide() || (!tabJeu[x-2][y-1].estVide() && ((this.isEstBlanc() &&!tabJeu[x-2][y-1].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&tabJeu[x-2][y-1].getPiece().isEstBlanc()))))){
             casesPossibles.add(tabJeu[x-2][y-1]);
         }
