@@ -76,7 +76,7 @@ public class Plateau {
 
         System.out.println("Quel est le nom de votre fichier de configuration ? (tapez enter pour la configuration de base)");
         fichier = clavier.nextLine();
-        if(fichier.equals("")) fichier="c.txt";//"configBase.txt";
+        if(fichier.equals("")) fichier="cpromo.txt";//"configBase.txt";
         BufferedReader ficTexte;
         try {
             ficTexte = new BufferedReader(new FileReader(new File(fichier)));
@@ -92,8 +92,7 @@ public class Plateau {
                 boolean couleur = true;
                 String lettre = "";
                 String[] position;
-                int a;
-                int b;
+                int a,b,i=0;
 
                 boolean estPiece; //si on traite la pièce ou sa position
                 Pion pion;
@@ -102,9 +101,7 @@ public class Plateau {
                 Fou fou;
                 Cavalier cavalier;
                 Tour tour;
-                int i =0;
                 while(i<mot.length){
-
                     if(mot[i].contains("white")){
                         couleur=true;
                         i++;
@@ -207,7 +204,6 @@ public class Plateau {
 
                     }else
                         System.out.print("__");
-
                 }
                 System.out.print(" ");
             }
@@ -224,8 +220,9 @@ public class Plateau {
     public void deplacerPiecePlateau(Case caseADeplacer, int xFinal, int yFinal){
         if(tabCases[xFinal][yFinal].getPiece()!= null) { //si la case du déplacement n'est pas vide
             System.out.println("Vous avez mangé une pièce de l'adversaire : " + tabCases[xFinal][yFinal].getPiece().getNom() + ".");
-            //this.compteurToursSansPrises = 0; //Une pièce a été mangée on remet le compteur à 0.
+            this.compteurToursSansPrises = 0; //Une pièce a été mangée on remet le compteur à 0.
             tabCases[xFinal][yFinal].getPiece().setEstMange(true); //la pièce de la case est mangée
+
             //On regarde si c'est le Roi d'une des couleurs qui est mort
             if(tabCases[xFinal][yFinal].getPiece().getNom() == "Roi"){
                 if(tabCases[xFinal][yFinal].getPiece().isEstBlanc())
@@ -248,6 +245,7 @@ public class Plateau {
         plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
         plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
 
+        //System.out.println(plateauTemp.estEnEchec(xFinal,yFinal,blanc));
         return plateauTemp.estEnEchec(xFinal,yFinal,blanc);
     }
     /**
@@ -262,7 +260,7 @@ public class Plateau {
         for(int i =0; i<TAILLE;i++){
             for(int j =0; j<TAILLE;j++){
                 // on s'intéresse aux pièces adverses
-                if((tabCases[i][j].getPiece() != null) && (blanc ? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
+                if((tabCases[i][j].getPiece() != null) && ((blanc)? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
                     casesPossibles.clear();
                     casesPossibles = tabCases[i][j].getPiece().afficherPossibilitees(i,j,tabCases);
                     for(Case c:casesPossibles){
@@ -283,10 +281,9 @@ public class Plateau {
      * @return vrai si le roi de la couleur donnée est en echec
      */
     public boolean estEnEchec(boolean blanc){
-        Vec2d posRoi=positionRoi(blanc);
+        Vec2d posRoi=this.positionRoi(blanc);
         return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
     }
-
 
 
     /**
@@ -296,21 +293,20 @@ public class Plateau {
      */
     public boolean estEnEchecEtMat(boolean blanc) {
         if (estEnEchec(blanc)) { //si le Roi est en echec on peut verifier si il est en echec et mat
+            //penser a verifier si aucune autre piece ne peut suspendre son echec
             Vec2d position = positionRoi(blanc);
-            if (position != null) {
-                int a = (int) position.x;
-                int b = (int) position.y;
-
+            if(position != null){
+                int a = (int) position.x, b = (int) position.y;
                 boolean resultat = true;
                 for (int i = a - 1; i <= a + 1; ++i) {
                     for (int j = b - 1; j <= b + 1; ++j) {
-                        if (i >= 0 && i < TAILLE && j >= 0 && j < TAILLE) {
+                        if (i >= 0 && i < TAILLE && j >= 0 && j < TAILLE)
                             resultat = resultat && this.simulationDeplacement(this.tabCases[a][b], i, j, blanc);
-                        }
                     }
                 }
                 return resultat;
             }
+            return false;
         }
         return false;
     }
@@ -333,14 +329,8 @@ public class Plateau {
         return position;
     }
 
-    public void pionPromotion(int x, int y){
+    public void pionPromotion(int x, int y, boolean IA){
         System.out.println("PROMOTION POSSIBLE ! Votre pion est arrivé a la dernière rangée !");
-        System.out.println("Vous voulez promouvoir votre pion en :");
-        System.out.println("1 = Dame");
-        System.out.println("2 = Four");
-        System.out.println("3 = Tour");
-        System.out.println("4 = Cavalier");
-        System.out.println("5 = Aucun de cas ci-contre.");
         int choix = 0;
         boolean isEntier = false;
         boolean couleur;
@@ -350,19 +340,30 @@ public class Plateau {
             couleur = false;
 
         //Choix de la promotion
-        while(choix > 5 || choix < 1) {
-            do { //boucle pour tester si le joueur a bien saisie un nombre
-                System.out.print("Veuillez saisir le numéro d'une des possibilités.");
-                isEntier = true;
-                Scanner scanner = new Scanner(System.in);
-                try{
-                    choix = scanner.nextInt();
-                } catch (InputMismatchException e)
-                {
-                    System.out.println("La valeur saisie n'est pas un entier");
-                    isEntier = false;
-                }
-            } while (isEntier != true);
+        if(IA){
+            choix = (int)(Math.random()*4 + 1);
+            System.out.println(choix);
+        }else{
+            System.out.println("Vous voulez promouvoir votre pion en :");
+            System.out.println("1 = Dame");
+            System.out.println("2 = Four");
+            System.out.println("3 = Tour");
+            System.out.println("4 = Cavalier");
+            System.out.println("5 = Aucun de cas ci-contre.");
+            while(choix > 5 || choix < 1) {
+                do { //boucle pour tester si le joueur a bien saisie un nombre
+                    System.out.print("Veuillez saisir le numéro de l'une des possibilités.");
+                    isEntier = true;
+                    Scanner scanner = new Scanner(System.in);
+                    try{
+                        choix = scanner.nextInt();
+                    } catch (InputMismatchException e)
+                    {
+                        System.out.println("La valeur saisie n'est pas un entier");
+                        isEntier = false;
+                    }
+                } while (isEntier != true);
+            }
         }
 
         //Promotion

@@ -52,7 +52,6 @@ public class Piece{
     }
 
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){
-
         LinkedList<Case> casesPossibles = new LinkedList<Case>();
         return casesPossibles;
     }

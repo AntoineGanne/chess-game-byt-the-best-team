@@ -21,7 +21,7 @@ public class Case {
     public Case(Case case1){
         this.x = case1.x;
         this.y = case1.y;
-        this.piece = (case1.piece != null)? new Piece(case1.piece):null;
+        this.piece = case1.piece;
     }
 
     /**
@@ -67,18 +67,20 @@ public class Case {
      * @param tabJeu
      * @return Liste des Cases possibles de déplacement selon la case courante
      */
-    public LinkedList<Case> afficherPossibilites(Case[][] tabJeu){
+    public LinkedList<Case> afficherPossibilites(Case[][] tabJeu, boolean IA){
         LinkedList<Case> poss;
         int a;
         char lettre;
         poss = this.piece.afficherPossibilitees(this.x,this.y, tabJeu);
-        if(poss.size() != 0) {
-            System.out.println("Possibilitées de déplacement");
-            for(int i = 0; i<poss.size();i++){
-                if(poss.get(i)!=null){
-                    a = poss.get(i).getY()+1;
-                    lettre = (char) (a + 'a' -1);
-                    System.out.println((i + 1) + ") Coordonnées : " +(8 - poss.get(i).getX()) + "  " + lettre);
+        if(!IA){
+            if(poss.size() != 0) {
+                System.out.println("Possibilitées de déplacement");
+                for(int i = 0; i<poss.size();i++){
+                    if(poss.get(i)!=null){
+                        a = poss.get(i).getY()+1;
+                        lettre = (char) (a + 'a' -1);
+                        System.out.println((i + 1) + ") Coordonnées : " +(8 - poss.get(i).getX()) + "  " + lettre);
+                    }
                 }
             }
         }

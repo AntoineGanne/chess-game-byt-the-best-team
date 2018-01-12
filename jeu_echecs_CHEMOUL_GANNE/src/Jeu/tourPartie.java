@@ -89,8 +89,9 @@ public class tourPartie {
     }
 
     public void choixIA(){
-        int l = (int)(Math.random()*7 + 1);
-        int c = (int)(Math.random()*7 + 1);
+        Random rd = new Random();
+        int l=rd.nextInt(8);
+        int c=rd.nextInt(8);
         this.ligne = l;
         this.colonne = c;
     }

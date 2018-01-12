@@ -5,6 +5,7 @@ import Jeu.Case;
 import java.util.LinkedList;
 
 public class Roi extends Piece{
+    private boolean positionInitiale = true;
 
     public Roi(boolean blanc){
         super(blanc,"Roi","roiB.png","roiN.png");
@@ -27,9 +28,14 @@ public class Roi extends Piece{
 
 
         //Ajouter Roque
-
-
-
         return casesPossibles;
+    }
+
+    public boolean isPositionInitiale() {
+        return positionInitiale;
+    }
+
+    public void setPositionInitiale(boolean positionInitiale) {
+        this.positionInitiale = positionInitiale;
     }
 }

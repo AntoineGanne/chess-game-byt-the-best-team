@@ -25,19 +25,13 @@ public class Partie {
      */
     public void moteurPartie(){
         initPartie();
-        /*if(this.estEnEchecEtMatPartie()){
+        if(this.estEnEchecEtMatPartie()){
+            this.plateauJeu.affichageConsole();
             finie = true;
-        }*/
+        }
         while(!this.finie) {
            afficherPartie();
-           if(intelligenceArtificielle) {
-               if (joueurActuel == 1) {
-                   choixPieceEtDeplacementIA();
-               }else
-                   choixPieceEtDeplacement();
-           }else{
-               choixPieceEtDeplacement();
-           }
+           choixPieceEtDeplacement();
            //CHANGEMENT DU JOUEUR
            boolean blanc = (joueurActuel == 1)? true:false;
            joueurActuel =  (joueurActuel == 1)? 0:1;
@@ -59,32 +53,53 @@ public class Partie {
     public void choixPieceEtDeplacement(){
         //CHOIX D'UNE PIECE A DEPLACER ET AFFICHAGE DES POSSIBILITES DE DEPLACEMENT
         int x, y;
+
+        boolean IAjoue = (intelligenceArtificielle && joueurActuel==1)? true:false;
         tourPartie t = new tourPartie();
-        LinkedList<Case> possibilites = new LinkedList<>();
+        LinkedList<Case> possibilites;
+        Piece piece;
+        if(IAjoue)
+            t.choixIA();
         do{
             do{
-                System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
-                t.saisieChoix();
+                if(IAjoue)
+                    t.choixIA();
+                else{
+                    System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
+                    t.saisieChoix();
+                }
                 x = t.getLigne();
                 y = t.getColonne();
+                piece = this.plateauJeu.getTabCases()[x][y].getPiece();
             }//la pièce choisie appartient bien au joueur et n'est pas null
-            while ((this.plateauJeu.getTabCases()[x][y].getPiece() == null) || (joueurActuel == 0)? !this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc():this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc());
-            possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
+            while ((piece == null) || !((piece.isEstBlanc() && joueurActuel == 0) || (!piece.isEstBlanc() && joueurActuel == 1)));
+            if(IAjoue)
+                possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases(),true);
+            else
+                possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases(),false);
         }
         while(possibilites.size() == 0); //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
 
         //CHOIX DU DEPLACEMENT PARMI LES POSSIBILITES
-        System.out.println("Saisissez le numéro de la possibilité que vous souhaitez appliquer");
-        Scanner sc = new Scanner(System.in);
-        int a = sc.nextInt();
-        while (a > possibilites.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
+        int a ;
+        if(IAjoue){
+            Random rnd = new Random();
+            a = rnd.nextInt(possibilites.size())+1;
+        }
+        else{
+            System.out.println("Saisissez le numéro de la possibilité que vous souhaitez appliquer");
+            Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-            System.out.println("Cette action n'est pas possible, selectionnez une des " + possibilites.size() + " options");
+            while (a > possibilites.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
+                a = sc.nextInt();
+                System.out.println("Cette action n'est pas possible, selectionnez une des " + possibilites.size() + " options");
+            }
         }
 
         //GESTION DU DEPLACEMENT
         String nom = this.plateauJeu.getTabCases()[x][y].getPiece().getNom();
-        System.out.println("Vous deplacez votre " + nom + ".");
+        if(!IAjoue)
+            System.out.println("Vous deplacez votre " + nom + ".");
         int xFinal = possibilites.get(a-1).getX(); // a-1 car le joueur saisi entre [1,8] et non [0,7]
         int yFinal = possibilites.get(a-1).getY();
         t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au tourPartie
@@ -93,47 +108,17 @@ public class Partie {
         this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
 
         this.listeTourParties.add(t);
+
         //----------------------------------
         //Test promotion
-        if(derniereLigne(xFinal) && nom.contains("Pion"))
-            this.plateauJeu.pionPromotion(xFinal,yFinal);
-        //----------------------------------
-    }
-
-    /**
-     * Cette classe gère le tour de l'intelligence artificielle.
-     * Si l'IA est en echec, on gère le déplacment du roi.
-     * Sinon on choisit une case au hazard qui lui appartient, puis une possibilité de déplacement au hazard.
-     */
-    public void choixPieceEtDeplacementIA(){
-        int x, y,poss;
-        Piece piece;
-        tourPartie t = new tourPartie();
-        LinkedList<Case> possibilites;
-        t.choixIA();
-        do{
-            do{
-                t.choixIA();
-                x = t.getLigne();
-                y = t.getColonne();
-                piece = this.plateauJeu.getTabCases()[x][y].getPiece();
+        if(derniereLigne(xFinal) && nom.contains("Pion")){
+            if(IAjoue){
+                this.plateauJeu.pionPromotion(xFinal,yFinal, true);
             }
-            while ((piece == null) || !((piece.isEstBlanc() && joueurActuel == 0) || (!piece.isEstBlanc() && joueurActuel == 1)));
-            possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases());
+            else
+                this.plateauJeu.pionPromotion(xFinal,yFinal, false);
         }
-        while(possibilites.size() == 0); //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
-        Random rnd = new Random();
-        poss = rnd.nextInt(possibilites.size()-1);
-
-        System.out.println("Vous deplacez votre " + piece.getNom() + ".");
-        int xFinal = possibilites.get(poss).getX();
-        int yFinal = possibilites.get(poss).getY();
-        t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au tourPartie
-        t.setColonneDeplacFinal(yFinal);
-
-        this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
-
-        this.listeTourParties.add(t);
+        //----------------------------------
     }
 
     /**
@@ -197,12 +182,12 @@ public class Partie {
             System.out.println("Les Noirs ont gagnés ! Bravo !");
             return true;
         }
-        /*if(this.plateauJeu.estEnEchecEtMat(false))
+        if(this.plateauJeu.estEnEchecEtMat(false))
         {
             System.out.println("Le Roi Noir est en ECHEC ET MAT");
             System.out.println("Les Blancs ont gagnés ! Bravo !");
             return true;
-        }*/
+        }
         return false;
     }
 
