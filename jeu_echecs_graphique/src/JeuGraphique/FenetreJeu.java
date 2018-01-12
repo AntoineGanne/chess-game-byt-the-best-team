@@ -1,25 +1,24 @@
 package JeuGraphique;
 import javax.swing.*;
 import java.awt.*;
-
-import Jeu.*;
-import Pieces.*;
+import java.awt.event.ActionListener;
 
 public class FenetreJeu extends JFrame{
     //images
     private JLabel titre = new JLabel("Le Super Jeu d'Echecs");
     private JButton[][] damier = new JButton[8][8];
-    private Color colorBlack = Color.gray;
+    private Color black = Color.gray;
     private JPanel echiquier;
     private JPanel menu;
     private JButton IA;
     private JButton deuxJoueurs;
-
-    private PartieGraphique partie;
+    private boolean partieACommencee;
+    private PartieG partie;
 
     public FenetreJeu(){
         super("Le Super Jeu d'Echecs !");
-        echiquier = new JPanel();
+        this.partieACommencee = false;
+        this.echiquier = new JPanel();
         menu = new JPanel();
         menu.setLayout(new GridLayout(8,1));
         Container contenu = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -29,7 +28,7 @@ public class FenetreJeu extends JFrame{
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
-        ButtonHandler buttonHandler = new ButtonHandler();
+        ActionListener buttonListener = new ButtonListener(this);
         echiquier.setLayout(new GridLayout(8,8));
         for(int i = 0; i<8;i++){
             for(int j=0;j<8;j++){
@@ -37,15 +36,17 @@ public class FenetreJeu extends JFrame{
 
                 damier[i][j].setSize(100,100);
                 if((i+j)%2 != 0)
-                    damier[i][j].setBackground(colorBlack);
+                    damier[i][j].setBackground(black);
                 echiquier.add(damier[i][j]);
-                //damier[i][j].addActionListener(buttonHandler);
+                damier[i][j].addActionListener(buttonListener);
                 //initialiser pion image
             }
         }
 
         deuxJoueurs= new JButton("Jouer à 2");
+        deuxJoueurs.addActionListener(buttonListener);
         IA = new JButton("Jouer contre l'IA");
+        IA.addActionListener(buttonListener);
         deuxJoueurs.setBackground(Color.white);
         IA.setBackground(Color.white);
         //ajouter evenement
@@ -61,9 +62,9 @@ public class FenetreJeu extends JFrame{
         contenu.add(echiquier);
         this.setContentPane(contenu);
 
-        /*this.demanderConfiguration();
-        this.mettreAJourDamier();*/
 
+        this.partie = new PartieG();
+        this.mettreAJourDamier();
     }
 
     public static void main(String[] args){
@@ -71,44 +72,42 @@ public class FenetreJeu extends JFrame{
         jeu.setVisible(true);
     }
 
-    public String demanderConfiguration(){
-        JFileChooser dialogue = new JFileChooser();
-        dialogue.showOpenDialog(null);
-        return dialogue.getSelectedFile().getAbsolutePath();
-    }
-
     public void mettreAJourDamier(){
         String nom;
-        boolean couleur = true;
+        String couleur;
         for(int i =0;i<8;i++){
             for(int j=0;j<8;j++){
                 if(this.partie.getPlateauJeu().getTabCases()[i][j].getPiece() !=null){
                     nom = this.partie.getPlateauJeu().getTabCases()[i][j].getPiece().getNom();
-                    couleur = this.partie.getPlateauJeu().getTabCases()[i][j].getPiece().isEstBlanc();
-                    switch(nom){
-                        case "Cavalier" :
-                            damier[i][j].setIcon(new ImageIcon("img/cavalierB.png"));
-                            break;
-                        case "Dame" :
-                            damier[i][j].setIcon(new ImageIcon("img/reineB.png"));
-                            break;
-                        case "Roi" :
-                            damier[i][j].setIcon(new ImageIcon("img/roiB.png"));
-                            break;
-                        case "Pion" :
-                            damier[i][j].setIcon(new ImageIcon("img/pionB.png"));
-                            break;
-                        case "tour" :
-                            damier[i][j].setIcon(new ImageIcon("img/tourB.png"));
-                            break;
-                        case "Fou" :
-                            damier[i][j].setIcon(new ImageIcon("img/fouB.png"));
-                            break;
-                        default:
-                            break;
-                    }
+                    couleur = (this.partie.getPlateauJeu().getTabCases()[i][j].getPiece().isEstBlanc())? "B":"N";
+                    String image="img/"+nom+couleur+".png";
+                    damier[i][j].setIcon(new ImageIcon(image));
                 }
             }
         }
+    }
+
+    public JButton[][] getDamier() {
+        return damier;
+    }
+
+    public JButton getIA() {
+        return IA;
+    }
+
+    public JButton getDeuxJoueurs() {
+        return deuxJoueurs;
+    }
+
+    public boolean isPartieACommencee() {
+        return partieACommencee;
+    }
+
+    public void setPartieACommencee(boolean partieACommencee) {
+        this.partieACommencee = partieACommencee;
+    }
+
+    public PartieG getPartie() {
+        return partie;
     }
 }

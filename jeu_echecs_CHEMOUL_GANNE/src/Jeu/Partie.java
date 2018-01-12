@@ -106,7 +106,6 @@ public class Partie {
         t.setColonneDeplacFinal(yFinal);
 
         this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
-
         this.listeTourParties.add(t);
 
         //----------------------------------
