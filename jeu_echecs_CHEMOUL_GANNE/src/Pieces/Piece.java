@@ -29,6 +29,13 @@ public class Piece{
         return nom;
     }
 
+    /**
+     *
+     * @param x emplacement x sur le plateau de jeu
+     * @param y emplacement y sur le plateau de jeu
+     * @param tabJeu
+     * @return
+     */
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){
         LinkedList<Case> casesPossibles = new LinkedList<Case>();
         return casesPossibles;

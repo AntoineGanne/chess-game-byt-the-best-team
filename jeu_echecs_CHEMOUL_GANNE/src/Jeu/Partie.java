@@ -31,6 +31,8 @@ public class Partie {
             this.plateauJeu.affichageConsole();
             finie = true;
         }
+        if(situationDePat(true))
+            System.out.println("PAAAAAAAAAAAAAAT");
         while(!this.finie) {
            afficherPartie();
            choixPieceEtDeplacement();
@@ -84,10 +86,7 @@ public class Partie {
                 piece = this.plateauJeu.getTabCases()[x][y].getPiece();
             }//la pièce choisie appartient bien au joueur et n'est pas null
             while ((piece == null) || !((piece.isEstBlanc() && joueurActuel == 0) || (!piece.isEstBlanc() && joueurActuel == 1)));
-            if(IAjoue)
-                possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases(),true);
-            else
-                possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases(),false);
+            possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases(),IAjoue);
         }
         while(possibilites.size() == 0 || estEnEchecSiDeplace(possibilites,this.plateauJeu.getTabCases()[x][y],piece.isEstBlanc()));
         //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
@@ -106,11 +105,11 @@ public class Partie {
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
             while (a > possibilites.size() || a <= 0 || this.plateauJeu.simulationDeplacement(this.plateauJeu.getTabCases()[x][y],possibilites.get(a-1).getX(),possibilites.get(a-1).getY(), piece.isEstBlanc())) {
-                a = sc.nextInt();
                 System.out.println("Cette action n'est pas possible. " +
                         "Soit l'entier que vous entrez ne correspond pas aux possibilités, " +
-                        "soit cela met votre Roi en echec." +
-                        "Selectionnez une des " + possibilites.size() + " options");
+                        "soit cela met votre Roi en echec. " +
+                        "Selectionnez une des " + possibilites.size() + " options proposées.");
+                a = sc.nextInt();
             }
         }
 
@@ -244,5 +243,24 @@ public class Partie {
                 return false;
         }
         return false;
+    }
+
+    /**
+     * Test si pour une couleur donnée tous les déplacements possibles mettent le Roi en échec = Pat
+     * @param blanc
+     * @return
+     */
+    public boolean situationDePat(boolean blanc){
+        for(int i=0;i<this.plateauJeu.getTAILLE();i++){
+            for(int j=0;j<this.plateauJeu.getTAILLE();j++){
+                Case caseTab = this.plateauJeu.getTabCases()[i][j];
+                if(caseTab.getPiece() != null && ((blanc && caseTab.getPiece().isEstBlanc()) || (!blanc && caseTab.getPiece().isEstBlanc()))){
+                    LinkedList<Case> poss = caseTab.getPiece().afficherPossibilitees(i,j,this.plateauJeu.getTabCases());
+                    if(!estEnEchecSiDeplace(poss,caseTab,blanc))
+                        return false;
+                }
+            }
+        }
+        return true;
     }
 }

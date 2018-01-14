@@ -291,7 +291,10 @@ public class Plateau {
      */
     public boolean estEnEchec(boolean blanc){
         Vec2d posRoi=this.positionRoi(blanc);
-        return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
+        if(posRoi!= null){
+            return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
+        }
+        return true; // au cas ou il manque un Roi sur la configuration chargée (ne devrait pas manquer)
     }
 
 
@@ -355,7 +358,7 @@ public class Plateau {
         }else{
             System.out.println("Vous voulez promouvoir votre pion en :");
             System.out.println("1 = Dame");
-            System.out.println("2 = Four");
+            System.out.println("2 = Fou");
             System.out.println("3 = Tour");
             System.out.println("4 = Cavalier");
             System.out.println("5 = Aucun de cas ci-contre.");
