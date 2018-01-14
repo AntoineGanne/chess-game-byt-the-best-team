@@ -1,1 +1,1 @@
-white p1 a7 k g1 black p1 a2 k g8
+white p1 a7 k g1 black p1 a2 k g8 p2 b2 p3 c2 p4 d2

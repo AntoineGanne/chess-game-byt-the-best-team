@@ -8,7 +8,7 @@ public class Roi extends Piece{
     private boolean positionInitiale = true;
 
     public Roi(boolean blanc){
-        super(blanc,"Roi","roiB.png","roiN.png");
+        super(blanc,"Roi");
     }
 
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){

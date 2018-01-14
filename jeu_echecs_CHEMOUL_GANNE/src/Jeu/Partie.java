@@ -2,6 +2,8 @@ package Jeu;
 
 import java.util.*;
 import Pieces.Piece;
+import com.sun.javafx.geom.Vec2d;
+
 
 public class Partie {
     private Joueur j1;
@@ -9,7 +11,7 @@ public class Partie {
     private int joueurActuel; //0 pour blanc, 1 pour noir
     private Plateau plateauJeu;
     private boolean finie;
-    private LinkedList<tourPartie> listeTourParties = new LinkedList<tourPartie>();
+    private LinkedList<Jeu.TourPartie> listeTourParties = new LinkedList<Jeu.TourPartie>();
     private boolean intelligenceArtificielle; //à 1 si le joueur veut jouer contre l'intelligenec artificielle
 
     /**
@@ -53,20 +55,29 @@ public class Partie {
     public void choixPieceEtDeplacement(){
         //CHOIX D'UNE PIECE A DEPLACER ET AFFICHAGE DES POSSIBILITES DE DEPLACEMENT
         int x, y;
-
         boolean IAjoue = (intelligenceArtificielle && joueurActuel==1)? true:false;
-        tourPartie t = new tourPartie();
+        Jeu.TourPartie t = new Jeu.TourPartie();
         LinkedList<Case> possibilites;
         Piece piece;
-        if(IAjoue)
-            t.choixIA();
         do{
             do{
-                if(IAjoue)
-                    t.choixIA();
-                else{
-                    System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
-                    t.saisieChoix();
+                if(this.plateauJeu.estEnEchec(false)) //Si le Roi est en echec il est obligatoire de le déplacer
+                {   Vec2d posRoi = this.plateauJeu.positionRoi(false);
+                    t.setLigne((int) posRoi.x);
+                    t.setColonne((int) posRoi.y);
+                }else if(this.plateauJeu.estEnEchec(true)){
+                    System.out.println("Le roi blanc est en ECHEC, il doit être déplacé.");
+                    Vec2d posRoi = this.plateauJeu.positionRoi(true);
+                    t.setLigne((int) posRoi.x);
+                    t.setColonne((int) posRoi.y);
+                }else{
+                    if(IAjoue){
+                        t.choixIA();
+                    }
+                    else{
+                        System.out.println("Saisissez la ligne et la colonne de la pièce que vous voulez deplacer. Et qui vous appartient !");
+                        t.saisieChoix();
+                    }
                 }
                 x = t.getLigne();
                 y = t.getColonne();
@@ -78,21 +89,28 @@ public class Partie {
             else
                 possibilites = this.plateauJeu.getTabCases()[x][y].afficherPossibilites(this.plateauJeu.getTabCases(),false);
         }
-        while(possibilites.size() == 0); //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
+        while(possibilites.size() == 0 || estEnEchecSiDeplace(possibilites,this.plateauJeu.getTabCases()[x][y],piece.isEstBlanc()));
+        //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
+        //De plus parmi les possibilités de déplacement il en existe qui ne mettent pas le Roi en echec
 
-        //CHOIX DU DEPLACEMENT PARMI LES POSSIBILITES
+         //CHOIX DU DEPLACEMENT PARMI LES POSSIBILITES
         int a ;
         if(IAjoue){
             Random rnd = new Random();
-            a = rnd.nextInt(possibilites.size())+1;
+            do {//On choisie une nouvelle possibilité de déplacement tant que celle-ci met le Roi en echec
+                a = rnd.nextInt(possibilites.size()) + 1;
+            }while (this.plateauJeu.simulationDeplacement(this.plateauJeu.getTabCases()[x][y],possibilites.get(a-1).getX(),possibilites.get(a-1).getY(), piece.isEstBlanc()));
         }
         else{
             System.out.println("Saisissez le numéro de la possibilité que vous souhaitez appliquer");
             Scanner sc = new Scanner(System.in);
             a = sc.nextInt();
-            while (a > possibilites.size() || a <= 0) {//tant que la possibilité choisie n'est pas comprises dans celles renvoyées
+            while (a > possibilites.size() || a <= 0 || this.plateauJeu.simulationDeplacement(this.plateauJeu.getTabCases()[x][y],possibilites.get(a-1).getX(),possibilites.get(a-1).getY(), piece.isEstBlanc())) {
                 a = sc.nextInt();
-                System.out.println("Cette action n'est pas possible, selectionnez une des " + possibilites.size() + " options");
+                System.out.println("Cette action n'est pas possible. " +
+                        "Soit l'entier que vous entrez ne correspond pas aux possibilités, " +
+                        "soit cela met votre Roi en echec." +
+                        "Selectionnez une des " + possibilites.size() + " options");
             }
         }
 
@@ -102,7 +120,7 @@ public class Partie {
             System.out.println("Vous deplacez votre " + nom + ".");
         int xFinal = possibilites.get(a-1).getX(); // a-1 car le joueur saisi entre [1,8] et non [0,7]
         int yFinal = possibilites.get(a-1).getY();
-        t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au tourPartie
+        t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au TourPartie
         t.setColonneDeplacFinal(yFinal);
 
         this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
@@ -110,13 +128,8 @@ public class Partie {
 
         //----------------------------------
         //Test promotion
-        if(derniereLigne(xFinal) && nom.contains("Pion")){
-            if(IAjoue){
-                this.plateauJeu.pionPromotion(xFinal,yFinal, true);
-            }
-            else
-                this.plateauJeu.pionPromotion(xFinal,yFinal, false);
-        }
+        if(derniereLigne(xFinal) && nom.contains("Pion"))
+            this.plateauJeu.pionPromotion(xFinal,yFinal, IAjoue);
         //----------------------------------
     }
 
@@ -131,8 +144,8 @@ public class Partie {
         System.out.println("Saisir le pseudo du second joueur: ");
         String p2 = num.next();
         j2 = new Joueur(p2);
-        plateauJeu.demanderEtChargerFichier();
-        intelligenceartficielle();
+        plateauJeu.demanderFichier();
+        intelligenceArtficielle();
     }
 
     public boolean derniereLigne(int x){
@@ -193,7 +206,7 @@ public class Partie {
     /**
      * permet de savoir si le joueur veut jouer contre l'IA et de mettre à jour en conséquant le booléen correspondant
      */
-    public void intelligenceartficielle(){
+    public void intelligenceArtficielle(){
         int tmp = -1;
         boolean isEntier = true;
         Scanner scanner;
@@ -213,5 +226,23 @@ public class Partie {
             this.intelligenceArtificielle = true;
         else
             this.intelligenceArtificielle = false;
+    }
+
+    /**
+     * Cette focntion permet de determiner si un déplacement mais le Roi en echec.
+     * @param possibilites
+     * @param caseADeplac
+     * @param blanc
+     * @return
+     */
+    public boolean estEnEchecSiDeplace(LinkedList<Case> possibilites, Case caseADeplac,boolean blanc){
+        if(possibilites.size() == 1){
+            return this.plateauJeu.simulationDeplacement(caseADeplac,possibilites.get(0).getX(),possibilites.get(0).getY(),blanc);
+        }
+        for(int i=0;i<possibilites.size();i++){
+            if(!this.plateauJeu.simulationDeplacement(caseADeplac,possibilites.get(0).getX(),possibilites.get(0).getY(),blanc))
+                return false;
+        }
+        return false;
     }
 }

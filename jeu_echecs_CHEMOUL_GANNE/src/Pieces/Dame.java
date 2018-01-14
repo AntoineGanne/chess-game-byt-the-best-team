@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Dame extends Piece {
 
     public Dame(boolean blanc){
-        super(blanc,"Dame","dameB.png","dameN.png");
+        super(blanc,"Dame");
     }
 
     public LinkedList<Case> afficherPossibilitees(int x, int y, Case[][] tabJeu){

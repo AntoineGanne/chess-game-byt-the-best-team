@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Fou extends Piece {
 
     public Fou(boolean blanc){
-        super(blanc,"Fou","fouB.png","fouN.png");
+        super(blanc,"Fou");
     }
 
 

@@ -67,10 +67,9 @@ public class Plateau {
         }
     }
 
-    public void demanderEtChargerFichier(){
+    public void demanderFichier(){
         String ligne = "";
         String fichier = "";
-        String [] mot;
         Scanner clavier = new Scanner(
                 System.in);
 
@@ -85,77 +84,84 @@ public class Plateau {
                         + fichier);
             }
             ligne = ficTexte.readLine();
-            if (ligne != null) {
-                mot = ligne.split (" ");
 
-                //traitement du chargement
-                boolean couleur = true;
-                String lettre = "";
-                String[] position;
-                int a,b,i=0;
+            this.chargerConfiguration(ligne);
 
-                boolean estPiece; //si on traite la pièce ou sa position
-                Pion pion;
-                Dame dame;
-                Roi roi;
-                Fou fou;
-                Cavalier cavalier;
-                Tour tour;
-                while(i<mot.length){
-                    if(mot[i].contains("white")){
-                        couleur=true;
-                        i++;
-                    }
-                    else if(mot[i].contains("black")){
-                        couleur=false;
-                        i++;
-                    }
-                    else{
-                        lettre = mot[i];
-                        position = mot[i+1].split("");
-                        if(position.length == 2){
-                            a= position[0].toCharArray()[0] - 'a';
-                            b = 8-Integer.parseInt(position[1]);
-
-                            if(lettre.contains("p")){ //pawn
-                                pion = new Pion(couleur);
-                                tabCases[b][a] = new Case(b,a, pion);
-                            }
-                            else if(lettre.contains("t")) //tower
-                            {
-                                tour = new Tour(couleur);
-                                tabCases[b][a] = new Case(b,a, tour);
-                            }
-                            else if(lettre.contains("q")) //queen
-                            {
-                                dame = new Dame(couleur);
-                                tabCases[b][a] = new Case(b,a, dame);
-                            }
-                            else if(lettre.contains("b")) //bishop
-                            {
-                                fou = new Fou(couleur);
-                                tabCases[b][a] = new Case(b,a, fou);
-                            }
-                            else if(lettre.contains("k1") || lettre.contains("k2")) //knight
-                            {
-                                cavalier = new Cavalier(couleur);
-                                tabCases[b][a] = new Case(b,a, cavalier);
-                            }
-                            else //king
-                            {
-                                roi = new Roi(couleur);
-                                tabCases[b][a] = new Case(b,a, roi);
-                            }
-                        }
-                        i=i+2;
-                    }
-                }
-                }
             ficTexte.close();
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        }
+    }
+
+    public void chargerConfiguration(String ligne){
+        String [] mot;
+        if (ligne != null) {
+            mot = ligne.split (" ");
+
+            //traitement du chargement
+            boolean couleur = true;
+            String lettre = "";
+            String[] position;
+            int a,b,i=0;
+
+            boolean estPiece; //si on traite la pièce ou sa position
+            Pion pion;
+            Dame dame;
+            Roi roi;
+            Fou fou;
+            Cavalier cavalier;
+            Tour tour;
+            while(i<mot.length){
+                if(mot[i].contains("white")){
+                    couleur=true;
+                    i++;
+                }
+                else if(mot[i].contains("black")){
+                    couleur=false;
+                    i++;
+                }
+                else{
+                    lettre = mot[i];
+                    position = mot[i+1].split("");
+                    if(position.length == 2){
+                        a= position[0].toCharArray()[0] - 'a';
+                        b = 8-Integer.parseInt(position[1]);
+
+                        if(lettre.contains("p")){ //pawn
+                            pion = new Pion(couleur);
+                            tabCases[b][a] = new Case(b,a, pion);
+                        }
+                        else if(lettre.contains("t")) //tower
+                        {
+                            tour = new Tour(couleur);
+                            tabCases[b][a] = new Case(b,a, tour);
+                        }
+                        else if(lettre.contains("q")) //queen
+                        {
+                            dame = new Dame(couleur);
+                            tabCases[b][a] = new Case(b,a, dame);
+                        }
+                        else if(lettre.contains("b")) //bishop
+                        {
+                            fou = new Fou(couleur);
+                            tabCases[b][a] = new Case(b,a, fou);
+                        }
+                        else if(lettre.contains("k1") || lettre.contains("k2")) //knight
+                        {
+                            cavalier = new Cavalier(couleur);
+                            tabCases[b][a] = new Case(b,a, cavalier);
+                        }
+                        else //king
+                        {
+                            roi = new Roi(couleur);
+                            tabCases[b][a] = new Case(b,a, roi);
+                        }
+                    }
+                    i=i+2;
+                }
+            }
         }
     }
 
@@ -236,17 +242,25 @@ public class Plateau {
         caseADeplacer.setPiece(null); //l'ancienne case n'a plus de pièce
     }
 
+    /**
+     * Cette fonction permet de savoir si un déplacement quelconque met notre propre roi en echec.
+     * @param caseADeplacer
+     * @param xFinal
+     * @param yFinal
+     * @param blanc
+     * @return
+     */
     public boolean simulationDeplacement(Case caseADeplacer, int xFinal, int yFinal, boolean blanc){
         Plateau plateauTemp = new Plateau(this);
         int a = caseADeplacer.getX();
         int b = caseADeplacer.getY();
 
-        //On effectue le déplacement
-        plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
-        plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
-
-        //System.out.println(plateauTemp.estEnEchec(xFinal,yFinal,blanc));
-        return plateauTemp.estEnEchec(xFinal,yFinal,blanc);
+        if(a != xFinal && b!=yFinal){ //si on ne déplace pas sur la même case
+            //On effectue le déplacement
+            plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
+            plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
+        }
+        return plateauTemp.estEnEchec(blanc);
     }
     /**
      *

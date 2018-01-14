@@ -2,7 +2,7 @@ package Jeu;
 
 import java.util.*;
 
-public class tourPartie {
+public class TourPartie {
     private int ligne, colonne; //du choix de la case ou se trouve la pièce que l'on souhaite deplacer
     private int ligneDeplacFinal, colonneDeplacFinal;
     //permettent de stocker le déplacement effectué (pour d'eventuelles statistiques)
@@ -10,7 +10,7 @@ public class tourPartie {
     /**
      * Constructeur par défaut
      */
-    public tourPartie() {
+    public TourPartie() {
         this.ligne = -1;
         this.colonne = -1;
         this.ligneDeplacFinal = -1;
@@ -29,6 +29,14 @@ public class tourPartie {
      */
     public int getColonne() {
         return this.colonne;
+    }
+
+    public void setLigne(int ligne) {
+        this.ligne = ligne;
+    }
+
+    public void setColonne(int colonne) {
+        this.colonne = colonne;
     }
 
     /**

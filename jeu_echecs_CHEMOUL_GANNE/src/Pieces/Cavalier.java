@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Cavalier extends Piece {
 
     public Cavalier(boolean blanc){
-        super(blanc,"Cavalier","cavalierB.png","cavalierN.png");
+        super(blanc,"Cavalier");
     }
 
 

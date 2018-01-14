@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class Pion extends Piece {
 
     public Pion(boolean blanc){
-        super(blanc,"Pion","pionB.png","pionN.png");
+        super(blanc,"Pion");
     }
 
     @Override
