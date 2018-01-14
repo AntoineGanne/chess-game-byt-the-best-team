@@ -11,7 +11,7 @@ public class Partie {
     private int joueurActuel; //0 pour blanc, 1 pour noir
     private Plateau plateauJeu;
     private boolean finie;
-    private LinkedList<Jeu.TourPartie> listeTourParties = new LinkedList<Jeu.TourPartie>();
+    private LinkedList<TourPartie> listeTourParties = new LinkedList<TourPartie>();
     private boolean intelligenceArtificielle; //à 1 si le joueur veut jouer contre l'intelligenec artificielle
 
     /**
@@ -56,7 +56,7 @@ public class Partie {
         //CHOIX D'UNE PIECE A DEPLACER ET AFFICHAGE DES POSSIBILITES DE DEPLACEMENT
         int x, y;
         boolean IAjoue = (intelligenceArtificielle && joueurActuel==1)? true:false;
-        Jeu.TourPartie t = new Jeu.TourPartie();
+        TourPartie t = new TourPartie();
         LinkedList<Case> possibilites;
         Piece piece;
         do{

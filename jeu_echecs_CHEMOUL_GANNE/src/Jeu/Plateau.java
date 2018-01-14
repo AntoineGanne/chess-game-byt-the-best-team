@@ -179,7 +179,6 @@ public class Plateau {
                     System.out.print("__");
                 else{
                     Piece temp = new Piece(tabCases[i][j].getPiece());
-                    if(!temp.isEstMange()){ //on l'affiche uniquement si elle est pas mangée
                         if(temp.isEstBlanc())
                             couleur = "b";
                         else
@@ -207,9 +206,6 @@ public class Plateau {
                                 System.out.print("__");
                                 break;
                         }
-
-                    }else
-                        System.out.print("__");
                 }
                 System.out.print(" ");
             }
@@ -227,7 +223,6 @@ public class Plateau {
         if(tabCases[xFinal][yFinal].getPiece()!= null) { //si la case du déplacement n'est pas vide
             System.out.println("Vous avez mangé une pièce de l'adversaire : " + tabCases[xFinal][yFinal].getPiece().getNom() + ".");
             this.compteurToursSansPrises = 0; //Une pièce a été mangée on remet le compteur à 0.
-            tabCases[xFinal][yFinal].getPiece().setEstMange(true); //la pièce de la case est mangée
 
             //On regarde si c'est le Roi d'une des couleurs qui est mort
             if(tabCases[xFinal][yFinal].getPiece().getNom() == "Roi"){

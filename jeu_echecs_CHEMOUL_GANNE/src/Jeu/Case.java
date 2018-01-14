@@ -84,7 +84,7 @@ public class Case {
      * @return vrai si la case est vide (si elle ne contient pas de pièce)
      */
     public boolean estVide(){
-        return (this.piece == null ||  this.piece.isEstMange() ); //ou l'ancienne piece a été mangée ou la case est vide
+        return this.piece == null;
     }
 
 }
