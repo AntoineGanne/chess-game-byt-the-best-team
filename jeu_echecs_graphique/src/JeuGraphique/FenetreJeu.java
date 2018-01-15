@@ -1,4 +1,7 @@
 package JeuGraphique;
+import Listener.ButtonListener;
+import Listener.CaseListener;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -7,7 +10,7 @@ public class FenetreJeu extends JFrame{
     //images
     private JLabel titre = new JLabel("Le Super Jeu d'Echecs");
     private JButton[][] damier = new JButton[8][8];
-    private Color white = new Color(255,219,168);
+    private Color white = new Color(250, 232, 218);
     private Color black = new  Color(180, 145, 94) ;
     private JPanel echiquier;
     private JPanel menu;
@@ -17,6 +20,7 @@ public class FenetreJeu extends JFrame{
     private boolean partieACommencee;
     private PartieG partie;
     private boolean IAactive;
+    //private JLabel informationLabel;
 
     public FenetreJeu(){
         super("Le Super Jeu d'Echecs !");
@@ -54,24 +58,28 @@ public class FenetreJeu extends JFrame{
             }
         }
 
+        //Boutons
         deuxJoueurs= new JButton("Jouer à 2");
         deuxJoueurs.addActionListener(buttonListener);
         IA = new JButton("Jouer contre l'IA");
         IA.addActionListener(buttonListener);
         recommencer = new JButton("Recommencer");
-        recommencer.setBackground(Color.white);
         recommencer.addActionListener(buttonListener);
+        recommencer.setBackground(Color.white);
         deuxJoueurs.setBackground(Color.white);
         IA.setBackground(Color.white);
-        //ajouter evenement
+        informationLabel = new JLabel("Bienvenue sur le Super jeu d'Echecs !");
+
         titre.setBounds(100,50,200,25);
         titre.setFont(new Font("Consolas", Font.PLAIN,24));
+
         menu.add(titre);
         menu.add(this.deuxJoueurs);
         menu.add(this.IA);
         menu.add(this.recommencer);
+        //menu.add(this.informationLabel);
 
-        this.menu.setBackground(Color.lightGray);
+        this.menu.setBackground(new Color(250, 232, 218));
         contenu.add(menu);
         contenu.add(echiquier);
         this.setContentPane(contenu);

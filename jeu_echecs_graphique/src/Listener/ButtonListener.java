@@ -1,11 +1,8 @@
-package JeuGraphique;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.LinkedList;
+package Listener;
 
-import Jeu.*;
-import Pieces.*;
+import java.awt.event.*;
+
+import JeuGraphique.FenetreJeu;
 
 public class ButtonListener implements ActionListener{
     private FenetreJeu echec;
@@ -20,10 +17,12 @@ public class ButtonListener implements ActionListener{
         if(source == this.echec.getDeuxJoueurs())
         {
             this.echec.setPartieACommencee(true);
+            this.echec.getPartie().setFinie(false);
             this.echec.getPartie().setIntelligenceArtificielle(false);
 
         }else if(source == this.echec.getIA()){
             this.echec.setPartieACommencee(true);
+            this.echec.getPartie().setFinie(false);
             this.echec.getPartie().setIntelligenceArtificielle(true);
         }
         else if(source == this.echec.getRecommencer()){

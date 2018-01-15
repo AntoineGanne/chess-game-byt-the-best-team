@@ -81,7 +81,7 @@ public class PlateauG {
     public void demanderEtChargerFichier(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
-        String fichier = "cPromo.txt";
+        String fichier = "config.txt";
         String [] mot;
 
         BufferedReader ficTexte;
@@ -309,7 +309,7 @@ public class PlateauG {
         }else {
             JOptionPane jop = new JOptionPane(), jop2 = new JOptionPane();
             String nom = (String)jop.showInputDialog(null,
-                    "Vous souhaitez promuvoir votre pion en : ",
+                    "Vous souhaitez promouvoir votre pion en : ",
                     "PROMOTION !",
                     JOptionPane.QUESTION_MESSAGE,
                     null,

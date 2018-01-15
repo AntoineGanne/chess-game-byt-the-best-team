@@ -1,13 +1,14 @@
-package JeuGraphique;
+package Listener;
+
+import JeuGraphique.CaseG;
+import JeuGraphique.FenetreJeu;
+import JeuGraphique.TourPartieG;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
-/**
- * Created by Léa on 15/01/2018.
- */
 public class CaseListener implements ActionListener {
     private FenetreJeu echec;
     private CaseG caseADeplac;
@@ -34,37 +35,7 @@ public class CaseListener implements ActionListener {
                                     this.echec.getPartie().getPlateauJeu().deplacerPiecePlateau(caseADeplac,i,j);
                                     this.echec.mettreAJourDamier();
                                     this.echec.enleverCouleur();
-                                    //Tout les traitements
-
-                                    //Promotion pion
-                                    if(this.echec.getPartie().derniereLigne(i)){
-                                        this.echec.getPartie().getPlateauJeu().pionPromotion(i,j,false);
-                                        this.echec.mettreAJourDamier();
-                                    }
-                                    this.peutJouer = false;
-
-
-                                    if(this.echec.isIAactive()){
-                                        this.echec.getPartie().setJoueurActuel(1);//necessaire pour traitement promotion
-                                        //traitement du tour de l'IA
-
-
-                                        //---------------Promotion
-                                        if(this.echec.getPartie().derniereLigne(i)){
-                                            this.echec.getPartie().getPlateauJeu().pionPromotion(i,j,true);
-                                            this.echec.mettreAJourDamier();
-                                        }
-                                        //---------------
-                                        this.echec.getPartie().setJoueurActuel(0);
-
-                                    }else{
-                                        this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
-                                    }
-                                    //Fin de partie
-                                    if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
-                                        this.echec.getPartie().setFinie(true);
-                                        this.echec.setPartieACommencee(false);
-                                    }
+                                    this.traitements(i,j);
                                 }
                             }else{
                                 boolean couleur = this.echec.getPartie().getPlateauJeu().getTabCases()[i][j].getPiece().isEstBlanc();
@@ -91,6 +62,42 @@ public class CaseListener implements ActionListener {
             }
         }else{
             javax.swing.JOptionPane.showMessageDialog(null,"Vous n'avez pas encore selectionné si vous vouliez jouer contre l'IA ou non.");
+        }
+    }
+
+    public void traitements(int i,int j){
+        //Tout les traitements
+
+        //Promotion pion
+        if(this.echec.getPartie().derniereLigne(i)
+                && this.echec.getPartie().getPlateauJeu().getTabCases()[i][j].getPiece().getNom().contains("Pion")){
+            this.echec.getPartie().getPlateauJeu().pionPromotion(i,j,false);
+            this.echec.mettreAJourDamier();
+        }
+        this.peutJouer = false;
+
+        if(this.echec.isIAactive()){
+            this.echec.getPartie().setJoueurActuel(1);//necessaire pour traitement promotion
+            //traitement du tour de l'IA
+
+
+
+            //---------------Promotion
+            if(this.echec.getPartie().derniereLigne(i)
+                    && this.echec.getPartie().getPlateauJeu().getTabCases()[i][j].getPiece().getNom().contains("Pion")){
+                this.echec.getPartie().getPlateauJeu().pionPromotion(i,j,true);
+                this.echec.mettreAJourDamier();
+            }
+            //---------------
+            this.echec.getPartie().setJoueurActuel(0);
+
+        }else{
+            this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
+        }
+        //Fin de partie
+        if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
+            this.echec.getPartie().setFinie(true);
+            this.echec.setPartieACommencee(false);
         }
     }
 }

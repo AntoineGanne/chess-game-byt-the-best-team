@@ -69,6 +69,14 @@ public class PartieG {
         }
         if(estEnEchecEtMatPartie())
             return true;
+        else{
+            if(this.getPlateauJeu().estEnEchec(true))
+                javax.swing.JOptionPane.showMessageDialog(null,"Le Roi BLANC est en ECHEC.");
+
+            if(this.getPlateauJeu().estEnEchec(false))
+                javax.swing.JOptionPane.showMessageDialog(null,"Le Roi NOIR est en ECHEC.");
+
+        }
         return false;
     }
 
@@ -87,6 +95,8 @@ public class PartieG {
     }
 
     public void tourIA(){
+        TourPartieG t = new TourPartieG();
+        t.choixIA();
 
     }
 
