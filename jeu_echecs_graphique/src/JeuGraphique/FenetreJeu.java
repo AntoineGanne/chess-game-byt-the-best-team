@@ -7,13 +7,16 @@ public class FenetreJeu extends JFrame{
     //images
     private JLabel titre = new JLabel("Le Super Jeu d'Echecs");
     private JButton[][] damier = new JButton[8][8];
-    private Color black = Color.gray;
+    private Color white = new Color(255,219,168);
+    private Color black = new  Color(180, 145, 94) ;
     private JPanel echiquier;
     private JPanel menu;
     private JButton IA;
     private JButton deuxJoueurs;
+    private JButton recommencer;
     private boolean partieACommencee;
     private PartieG partie;
+    private boolean IAactive;
 
     public FenetreJeu(){
         super("Le Super Jeu d'Echecs !");
@@ -28,8 +31,14 @@ public class FenetreJeu extends JFrame{
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+
+
+
+        ActionListener caseListener = new CaseListener(this);
         ActionListener buttonListener = new ButtonListener(this);
         echiquier.setLayout(new GridLayout(8,8));
+        echiquier.setBorder(BorderFactory.createLineBorder(new Color(135, 73, 28),15));
+
         for(int i = 0; i<8;i++){
             for(int j=0;j<8;j++){
                 damier[i][j] = new JButton();
@@ -37,8 +46,10 @@ public class FenetreJeu extends JFrame{
                 damier[i][j].setSize(100,100);
                 if((i+j)%2 != 0)
                     damier[i][j].setBackground(black);
+                else
+                    damier[i][j].setBackground(white);
                 echiquier.add(damier[i][j]);
-                damier[i][j].addActionListener(buttonListener);
+                damier[i][j].addActionListener(caseListener);
                 //initialiser pion image
             }
         }
@@ -47,6 +58,9 @@ public class FenetreJeu extends JFrame{
         deuxJoueurs.addActionListener(buttonListener);
         IA = new JButton("Jouer contre l'IA");
         IA.addActionListener(buttonListener);
+        recommencer = new JButton("Recommencer");
+        recommencer.setBackground(Color.white);
+        recommencer.addActionListener(buttonListener);
         deuxJoueurs.setBackground(Color.white);
         IA.setBackground(Color.white);
         //ajouter evenement
@@ -55,16 +69,16 @@ public class FenetreJeu extends JFrame{
         menu.add(titre);
         menu.add(this.deuxJoueurs);
         menu.add(this.IA);
+        menu.add(this.recommencer);
 
-        //contenu.setLayout(GridLayout);
         this.menu.setBackground(Color.lightGray);
         contenu.add(menu);
         contenu.add(echiquier);
         this.setContentPane(contenu);
 
 
-        this.partie = new PartieG();
-        this.mettreAJourDamier();
+        this.nouvellePartie();
+
     }
 
     public static void main(String[] args){
@@ -72,9 +86,18 @@ public class FenetreJeu extends JFrame{
         jeu.setVisible(true);
     }
 
+    public boolean isIAactive() {
+        return IAactive;
+    }
+
+    public void setIAactive(boolean IAactive) {
+        this.IAactive = IAactive;
+    }
+
     public void mettreAJourDamier(){
         String nom;
         String couleur;
+
         for(int i =0;i<8;i++){
             for(int j=0;j<8;j++){
                 if(this.partie.getPlateauJeu().getTabCases()[i][j].getPiece() !=null){
@@ -82,9 +105,28 @@ public class FenetreJeu extends JFrame{
                     couleur = (this.partie.getPlateauJeu().getTabCases()[i][j].getPiece().isEstBlanc())? "B":"N";
                     String image="img/"+nom+couleur+".png";
                     damier[i][j].setIcon(new ImageIcon(image));
+                }else{
+                    damier[i][j].setIcon(null);
                 }
             }
         }
+    }
+
+
+    public void enleverCouleur(){
+        for(int i = 0; i<8;i++){
+            for(int j=0;j<8;j++){
+                if((i+j)%2 != 0)
+                    damier[i][j].setBackground(black);
+                else
+                    damier[i][j].setBackground(white);
+            }
+        }
+    }
+
+    public void nouvellePartie(){
+        this.partie = new PartieG();
+        this.mettreAJourDamier();
     }
 
     public JButton[][] getDamier() {
@@ -110,4 +152,6 @@ public class FenetreJeu extends JFrame{
     public PartieG getPartie() {
         return partie;
     }
+
+    public JButton getRecommencer() { return recommencer; }
 }

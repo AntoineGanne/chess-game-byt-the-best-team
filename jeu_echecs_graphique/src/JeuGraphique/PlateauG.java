@@ -80,7 +80,8 @@ public class PlateauG {
 
     public void demanderEtChargerFichier(){
         String ligne = "";
-        String fichier = this.demanderConfiguration();
+        //String fichier = this.demanderConfiguration();
+        String fichier = "cPromo.txt";
         String [] mot;
 
         BufferedReader ficTexte;
@@ -166,13 +167,6 @@ public class PlateauG {
     }
 
     /**
-     *  Affichage de notre plateau de jeu avec les pièces respectives sur la console.
-     */
-    public void affichageConsole(){
-
-    }
-
-    /**
      *
      * @param xFinal coordonee finale x de la piece sur la grille
      * @param yFinal coordonee finale y de la piece sur la grille
@@ -196,17 +190,25 @@ public class PlateauG {
         caseADeplacer.setPiece(null); //l'ancienne case n'a plus de pièce
     }
 
+    /**
+     * Cette fonction permet de savoir si un déplacement quelconque met notre propre roi en echec.
+     * @param caseADeplacer
+     * @param xFinal
+     * @param yFinal
+     * @param blanc
+     * @return
+     */
     public boolean simulationDeplacement(CaseG caseADeplacer, int xFinal, int yFinal, boolean blanc){
         PlateauG plateauTemp = new PlateauG(this);
         int a = caseADeplacer.getX();
         int b = caseADeplacer.getY();
 
-        //On effectue le déplacement
-        plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
-        plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
-
-        //System.out.println(plateauTemp.estEnEchec(xFinal,yFinal,blanc));
-        return plateauTemp.estEnEchec(xFinal,yFinal,blanc);
+        if(a != xFinal && b!=yFinal){ //si on ne déplace pas sur la même case
+            //On effectue le déplacement
+            plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
+            plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
+        }
+        return plateauTemp.estEnEchec(blanc);
     }
     /**
      *
@@ -242,7 +244,10 @@ public class PlateauG {
      */
     public boolean estEnEchec(boolean blanc){
         Vec2d posRoi=this.positionRoi(blanc);
-        return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
+        if(posRoi!= null){
+            return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
+        }
+        return true; // au cas ou il manque un Roi sur la configuration chargée (ne devrait pas manquer)
     }
 
 
@@ -252,19 +257,22 @@ public class PlateauG {
      * @return vrai si le roi de la couleur donnée est en echec et mat
      */
     public boolean estEnEchecEtMat(boolean blanc) {
-        if (estEnEchec(blanc)) { //si le Roi est en echec on peut verifier si il est en echec et mat
-            //penser a verifier si aucune autre piece ne peut suspendre son echec
-            Vec2d position = positionRoi(blanc);
-            if(position != null){
-                int a = (int) position.x, b = (int) position.y;
-                boolean resultat = true;
-                for (int i = a - 1; i <= a + 1; ++i) {
-                    for (int j = b - 1; j <= b + 1; ++j) {
-                        if (i >= 0 && i < TAILLE && j >= 0 && j < TAILLE)
-                            resultat = resultat && this.simulationDeplacement(this.tabCases[a][b], i, j, blanc);
+        if(!this.isRoiBlancMort() && !this.isRoiNoirMort()){
+            if (estEnEchec(blanc)) { //si le Roi est en echec on peut verifier si il est en echec et mat
+                //penser a verifier si aucune autre piece ne peut suspendre son echec
+                Vec2d position = positionRoi(blanc);
+                if(position != null){
+                    int a = (int) position.x, b = (int) position.y;
+                    boolean resultat = true;
+                    for (int i = a - 1; i <= a + 1; ++i) {
+                        for (int j = b - 1; j <= b + 1; ++j) {
+                            if (i >= 0 && i < TAILLE && j >= 0 && j < TAILLE)
+                                resultat = resultat && this.simulationDeplacement(this.tabCases[a][b], i, j, blanc);
+                        }
                     }
+                    return resultat;
                 }
-                return resultat;
+                return false;
             }
             return false;
         }
@@ -290,61 +298,44 @@ public class PlateauG {
     }
 
     public void pionPromotion(int x, int y, boolean IA){
-        System.out.println("PROMOTION POSSIBLE ! Votre pion est arrivé a la dernière rangée !");
-        int choix = 0;
-        boolean isEntier = false;
+        String choix;
         boolean couleur;
-        if(tabCases[x][y].getPiece() != null && tabCases[x][y].getPiece().isEstBlanc())
-            couleur = true;
-        else
-            couleur = false;
-
+        String[] promotion = {"Dame", "Fou", "Tour","Cavalier","Aucun"};
+        couleur = tabCases[x][y].getPiece() != null && tabCases[x][y].getPiece().isEstBlanc();
         //Choix de la promotion
         if(IA){
-            choix = (int)(Math.random()*4 + 1);
-            System.out.println(choix);
-        }else{
-            System.out.println("Vous voulez promouvoir votre pion en :");
-            System.out.println("1 = Dame");
-            System.out.println("2 = Four");
-            System.out.println("3 = Tour");
-            System.out.println("4 = Cavalier");
-            System.out.println("5 = Aucun de cas ci-contre.");
-            while(choix > 5 || choix < 1) {
-                do { //boucle pour tester si le joueur a bien saisie un nombre
-                    System.out.print("Veuillez saisir le numéro de l'une des possibilités.");
-                    isEntier = true;
-                    Scanner scanner = new Scanner(System.in);
-                    try{
-                        choix = scanner.nextInt();
-                    } catch (InputMismatchException e)
-                    {
-                        System.out.println("La valeur saisie n'est pas un entier");
-                        isEntier = false;
-                    }
-                } while (isEntier != true);
-            }
+            int c = (int)(Math.random()*4);
+            choix = promotion[c];
+        }else {
+            JOptionPane jop = new JOptionPane(), jop2 = new JOptionPane();
+            String nom = (String)jop.showInputDialog(null,
+                    "Vous souhaitez promuvoir votre pion en : ",
+                    "PROMOTION !",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    promotion,
+                    promotion[4]);
+            choix = nom;
         }
-
         //Promotion
         switch (choix){
-            case(1):
+            case("Dame"):
                 Dame dame = new Dame(couleur);
                 tabCases[x][y].setPiece(dame);
                 break;
-            case(2):
+            case("Fou"):
                 Fou fou = new Fou(couleur);
                 tabCases[x][y].setPiece(fou);
                 break;
-            case(3):
+            case("Tour"):
                 Tour tour = new Tour(couleur);
                 tabCases[x][y].setPiece(tour);
                 break;
-            case(4):
+            case("Cavalier"):
                 Cavalier cavalier = new Cavalier(couleur);
                 tabCases[x][y].setPiece(cavalier);
                 break;
-            case(5):
+            default:
                 break;
         }
     }

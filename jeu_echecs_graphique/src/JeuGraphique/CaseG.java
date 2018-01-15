@@ -95,4 +95,14 @@ public class CaseG {
         return (this.piece == null ||  this.piece.isEstMange() ); //ou l'ancienne piece a été mangée ou la case est vide
     }
 
+    public boolean appartientAPossibilites(LinkedList<CaseG> poss,int x,int y){
+        for(int i=0;i<poss.size();i++){
+            System.out.println(poss.get(i).getX()+" " + poss.get(i).getY());
+            if(poss.get(i).getX() == x && poss.get(i).getY()==y){
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

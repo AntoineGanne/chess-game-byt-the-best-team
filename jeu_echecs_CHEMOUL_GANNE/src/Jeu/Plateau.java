@@ -346,10 +346,7 @@ public class Plateau {
         int choix = 0;
         boolean isEntier = false;
         boolean couleur;
-        if(tabCases[x][y].getPiece() != null && tabCases[x][y].getPiece().isEstBlanc())
-            couleur = true;
-        else
-            couleur = false;
+        couleur = tabCases[x][y].getPiece() != null && tabCases[x][y].getPiece().isEstBlanc();
 
         //Choix de la promotion
         if(IA){

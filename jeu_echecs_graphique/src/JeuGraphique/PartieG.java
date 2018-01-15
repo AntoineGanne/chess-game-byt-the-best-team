@@ -1,16 +1,12 @@
 package JeuGraphique;
 
-import Jeu.Joueur;
-
-import java.util.LinkedList;
-
 public class PartieG {
     private PlateauG plateauJeu;
-    private Joueur j1;
-    private Joueur j2;
+    private JoueurG j1;
+    private JoueurG j2;
     private int joueurActuel; //0 pour blanc, 1 pour noir
     private boolean finie;
-    //private LinkedList<tourPartie> listeTourParties = new LinkedList<tourPartie>();
+    //private LinkedList<TourPartieG> listeTourParties = new LinkedList<TourPartieG>();
     private boolean intelligenceArtificielle; //à 1 si le joueur veut jouer contre l'intelligenec artificielle
 
 
@@ -19,6 +15,8 @@ public class PartieG {
      */
     public PartieG(){
         this.plateauJeu = new PlateauG(8);
+        this.j1 = new JoueurG(1);
+        this.j2 = new JoueurG(2);
         this.joueurActuel = 0;
     }
 
@@ -50,4 +48,46 @@ public class PartieG {
     public void setIntelligenceArtificielle(boolean intelligenceArtificielle) {
         this.intelligenceArtificielle = intelligenceArtificielle;
     }
+
+    public boolean derniereLigne(int x){
+        boolean blanc = (joueurActuel == 0)? true:false;
+        if(blanc)
+            return x==0;
+        else
+            return x==7;
+    }
+
+    public boolean estFinie(){
+        if(this.plateauJeu.isRoiBlancMort()){
+            javax.swing.JOptionPane.showMessageDialog(null,"Les Noirs ont gagnés ! Bravo !");
+            return true;
+        }
+        if(this.plateauJeu.isRoiNoirMort()){
+            javax.swing.JOptionPane.showMessageDialog(null,"Les Blancs ont gagnés ! Bravo !");
+            //afichage gagnant
+            return true;
+        }
+        if(estEnEchecEtMatPartie())
+            return true;
+        return false;
+    }
+
+    public boolean estEnEchecEtMatPartie(){
+        if(this.plateauJeu.estEnEchecEtMat(true))
+        {
+            javax.swing.JOptionPane.showMessageDialog(null,"Le Roi Blanc est en ECHEC ET MAT! Les Noirs ont gagnés ! Bravo !");
+            return true;
+        }
+        if(this.plateauJeu.estEnEchecEtMat(false))
+        {
+            javax.swing.JOptionPane.showMessageDialog(null,"Le Roi Noir est en ECHEC ET MAT! Les Blancs ont gagnés ! Bravo !");
+            return true;
+        }
+        return false;
+    }
+
+    public void tourIA(){
+
+    }
+
 }
