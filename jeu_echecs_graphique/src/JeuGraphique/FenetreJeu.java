@@ -59,16 +59,22 @@ public class FenetreJeu extends JFrame{
         }
 
         //Boutons
-        deuxJoueurs= new JButton("Jouer à 2");
+        deuxJoueurs= new JButton("Jouer à 2 joueurs");
         deuxJoueurs.addActionListener(buttonListener);
+        deuxJoueurs.setVerticalTextPosition(SwingConstants.CENTER);
+        deuxJoueurs.setHorizontalTextPosition(SwingConstants.CENTER);
         IA = new JButton("Jouer contre l'IA");
         IA.addActionListener(buttonListener);
         recommencer = new JButton("Recommencer");
         recommencer.addActionListener(buttonListener);
+        recommencer.setVerticalTextPosition(SwingConstants.CENTER);
+        recommencer.setHorizontalTextPosition(SwingConstants.CENTER);
+        IA.setVerticalTextPosition(SwingConstants.CENTER);
+        IA.setHorizontalTextPosition(SwingConstants.CENTER);
         recommencer.setBackground(Color.white);
         deuxJoueurs.setBackground(Color.white);
         IA.setBackground(Color.white);
-        informationLabel = new JLabel("Bienvenue sur le Super jeu d'Echecs !");
+        //informationLabel = new JLabel("Bienvenue sur le Super jeu d'Echecs !");
 
         titre.setBounds(100,50,200,25);
         titre.setFont(new Font("Consolas", Font.PLAIN,24));
@@ -120,6 +126,9 @@ public class FenetreJeu extends JFrame{
         }
     }
 
+    public void mettreRoiRouge(){//si il est en echec
+
+    }
 
     public void enleverCouleur(){
         for(int i = 0; i<8;i++){

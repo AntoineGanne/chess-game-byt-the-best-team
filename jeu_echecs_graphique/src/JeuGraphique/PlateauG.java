@@ -81,13 +81,13 @@ public class PlateauG {
     public void demanderEtChargerFichier(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
-        String fichier = "config.txt";
+        String fichier = "configBase.txt";
         String [] mot;
 
         BufferedReader ficTexte;
         try {
             ficTexte = new BufferedReader(new FileReader(new File(fichier)));
-            if (ficTexte == null) {
+            if (ficTexte == null){
                 throw new FileNotFoundException("Fichier non trouvé : "
                         + fichier);
             }
