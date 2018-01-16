@@ -81,7 +81,7 @@ public class PlateauG {
     public void demanderEtChargerFichier(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
-        String fichier = "configBase.txt";
+        String fichier = "cRoque.txt";
         String [] mot;
 
         BufferedReader ficTexte;
@@ -184,6 +184,8 @@ public class PlateauG {
                 else
                     this.roiNoirMort = true;
             }
+
+            caseADeplacer.getPiece().setPositionInitiale(false);
         }else
             this.compteurToursSansPrises++;
         tabCases[xFinal][yFinal].setPiece(caseADeplacer.getPiece()); //la nouvelle pièce de la case est la notre
@@ -208,7 +210,7 @@ public class PlateauG {
             plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
             plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
         }
-        return plateauTemp.estEnEchec(blanc);
+        return plateauTemp.estEnEchec(xFinal,yFinal,blanc);
     }
     /**
      *
@@ -224,13 +226,17 @@ public class PlateauG {
                 // on s'intéresse aux pièces adverses
                 if((tabCases[i][j].getPiece() != null) && ((blanc)? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
                     casesPossibles.clear();
-                    casesPossibles = tabCases[i][j].getPiece().afficherPossibilitees(i,j,tabCases);
-                    for(CaseG c:casesPossibles){
-                        //si l'une des cases possibles pour l'adversaire est la position (x,y) donnée alors cette position est un échec
-                        if(c.getX()==x && c.getY()==y) {
-                            return true;
+                    casesPossibles = tabCases[i][j].getPiece().afficherPossibilitees(i,j,this);
+                    if(tabCases[i][j].getPiece().getNom().equals("Pion"))
+                    {
+                        for(int k=0;k<casesPossibles.size();k++)
+                        {
+                            if(casesPossibles.get(k).getY()==j)
+                                casesPossibles.remove(k);
                         }
                     }
+                    if(casesPossibles.contains(tabCases[x][y]))
+                        return true;
                 }
             }
         }
@@ -338,5 +344,102 @@ public class PlateauG {
             default:
                 break;
         }
+    }
+
+    public boolean petitRoquePossible(boolean blanc){
+        Vec2d posRoi = positionRoi(blanc);
+        int a = (int)posRoi.x;
+        int b = (int)posRoi.y;
+        if(tabCases[a][b].getPiece().isPositionInitiale())
+        {
+            int ligne = (blanc)? 7:0; //Le roque s'effectue sur la ligne de départ
+            if(posRoi!=null && a==ligne && b == 4){
+                for(int i=1;i<3;i++){
+                    if(!this.getTabCases()[ligne][4+i].estVide() || simulationDeplacement(tabCases[a][b],ligne,4+i,blanc)){
+                        return false;
+                    }
+                }
+            }else{
+                return false;
+            }
+            return ((this.getTabCases()[ligne][7].getPiece() != null) && this.getTabCases()[ligne][7].getPiece().getNom().equals("Tour") && this.getTabCases()[ligne][7].getPiece().isPositionInitiale());
+        }
+        return false;
+    }
+
+    public boolean grandRoquePossible(boolean blanc){
+        Vec2d posRoi = positionRoi(blanc);
+        int ligne = (blanc)? 7:0; //Le roque s'effectue sur la ligne de départ
+        int a = (int)posRoi.x;
+        int b = (int)posRoi.y;
+        if(tabCases[a][b].getPiece().isPositionInitiale())
+        {
+            if(posRoi!=null && a==ligne && b == 4){
+                for(int i=-1;i>=-4;i--){
+                    if(i+4!=0 && !this.getTabCases()[ligne][4+i].estVide())
+                        return false;
+                }
+            }else{
+                return false;
+            }
+            return (this.getTabCases()[ligne][0].getPiece() != null) && this.getTabCases()[ligne][0].getPiece().getNom().contains("Tour");
+        }else
+            return false;
+    }
+
+    /**
+     *
+     * @param grand
+     * @param blanc
+     * @return vrai si le roque a été effectué
+     */
+    public void effectuerRoque(boolean grand, boolean blanc){
+        int ligne = (blanc)? 7:0;
+        if(grand){
+            deplacerPiecePlateau(this.getTabCases()[ligne][4],ligne,2); //On déplace le Roi
+            deplacerPiecePlateau(this.getTabCases()[ligne][0],ligne,3); //On déplace la Tour
+        }else{
+            deplacerPiecePlateau(this.getTabCases()[ligne][4],ligne,6); //On déplace le Roi
+            deplacerPiecePlateau(this.getTabCases()[ligne][0],ligne,5); //On déplace la Tour
+        }
+
+    }
+
+    public boolean priseEnPassant(int i, int j, boolean blanc){
+        boolean deuxCaseDepl = (blanc)? (i==4):(i==3);
+        if(this.getTabCases()[i][j].getPiece().getNom().equals("Pion") && deuxCaseDepl){
+            LinkedList<CaseG> possPionPrise= new LinkedList<>(); //pion de l'adversaire qui peuvent prendre en passant
+            int ligne = (blanc)? 4:3;
+
+            if(this.getTabCases()[ligne][j+1].getPiece() != null && this.getTabCases()[ligne][j+1].getPiece().getNom().equals("Pion")){
+                boolean couleur1 = this.getTabCases()[ligne][j+1].getPiece().isEstBlanc();
+                if((blanc)? !couleur1:couleur1)
+                    possPionPrise.add(this.getTabCases()[ligne][j+1]);
+            }
+            if(this.getTabCases()[ligne][j-1].getPiece() != null && this.getTabCases()[ligne][j-1].getPiece().getNom().equals("Pion")){
+                boolean couleur2 = this.getTabCases()[ligne][j-1].getPiece().isEstBlanc();
+                if((blanc)? couleur2:!couleur2)
+                    possPionPrise.add(this.getTabCases()[ligne][j-1]);
+            }
+            JOptionPane jop = new JOptionPane();
+            //DEMANDE AU JOUEUR
+            if(possPionPrise.size()!=0){
+                int option = jop.showConfirmDialog(null, "Voulez-vous prendre le pion de l'adversaire en passant ?", "Prise en passant", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                if(option == 0){
+                    Random rd = new Random();
+                    int l=rd.nextInt(possPionPrise.size());
+                    deplacerPiecePlateau(possPionPrise.get(l),i+1,j);
+                    return true;
+                }
+                else
+                    return false;
+            }
+            return false;
+        }
+        return false;
+    }
+
+    public void setCompteurToursSansPrises(int compteurToursSansPrises) {
+        this.compteurToursSansPrises = compteurToursSansPrises;
     }
 }

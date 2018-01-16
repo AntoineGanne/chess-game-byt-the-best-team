@@ -26,8 +26,9 @@ public class ButtonListener implements ActionListener{
             this.echec.getPartie().setIntelligenceArtificielle(true);
         }
         else if(source == this.echec.getRecommencer()){
-        this.echec.getPartie().setFinie(false);
-        this.echec.nouvellePartie();
+            this.echec.getPartie().setFinie(false);
+            this.echec.nouvellePartie();
+            this.echec.enleverCouleur();
         }
     }
 }

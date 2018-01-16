@@ -31,6 +31,14 @@ public class TourPartieG {
         return this.colonne;
     }
 
+    public void setLigne(int ligne) {
+        this.ligne = ligne;
+    }
+
+    public void setColonne(int colonne) {
+        this.colonne = colonne;
+    }
+
     /**
      * Met à jour la ligne du déplacement choisi
      */

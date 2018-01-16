@@ -6,6 +6,7 @@ import java.util.LinkedList;
 public class Piece{
     private String nom;
     private boolean estBlanc;
+    private enum nomPiece {ROI,DAME,CAVALIER,PION,TOUR,FOU};
 
     /**
      * 

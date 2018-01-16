@@ -2,12 +2,16 @@ package Listener;
 
 import JeuGraphique.CaseG;
 import JeuGraphique.FenetreJeu;
+import JeuGraphique.PlateauG;
 import JeuGraphique.TourPartieG;
+import com.sun.javafx.geom.Vec2d;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.LinkedList;
+import java.util.Random;
+import Pieces.*;
 
 public class CaseListener implements ActionListener {
     private FenetreJeu echec;
@@ -21,39 +25,63 @@ public class CaseListener implements ActionListener {
 
     public void actionPerformed(ActionEvent e)
     {
+        PlateauG plateauTemp = this.echec.getPartie().getPlateauJeu();
         Object source = e.getSource();
         if(this.echec.isPartieACommencee()){
             if(!this.echec.getPartie().isFinie()){
                 if(!this.peutJouer){
-                    this.echec.enleverCouleur();
+                    this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
                 }
-                for(int i =0; i<8;i++){
+                this.echec.mettreRoiRouge(true); //Met en rouge la case du Roi blanc si il est en echec
+                this.echec.mettreRoiRouge(false); //Respectivement du Roi noir.
+                for(int i =0; i<8;i++){ //On parcours ici le damier de JButton
                     for(int j=0;j<8;j++){
                         if(source == this.echec.getDamier()[i][j]){
-                            if(this.peutJouer){
-                                if(caseADeplac.appartientAPossibilites(poss,i,j)){
-                                    this.echec.getPartie().getPlateauJeu().deplacerPiecePlateau(caseADeplac,i,j);
+                            if(this.peutJouer){ //Si on a déjà selectionné la case a déplacer
+                                int a = caseADeplac.getX();
+                                int b = caseADeplac.getY();
+                                boolean blanc = caseADeplac.getPiece().isEstBlanc();
+                                if(caseADeplac.appartientAPossibilites(poss,i,j,plateauTemp)){
+                                    //Si la case choisie comme déplacement appartient aux possibilités
+                                    plateauTemp.deplacerPiecePlateau(caseADeplac,i,j);
+                                }else if(this.echec.getDamier()[i][j].getText().equals("Roque")){//Cas particulier car le Roque n'appartient pas aux possibilités
+                                    plateauTemp.effectuerRoque((j==2),blanc);
+                                    this.echec.getDamier()[(blanc)?7:0][j].setText("");//On enlève le mot Roque
+                                }
+                                if(plateauTemp.estEnEchec(blanc)) //Si notre déplacement a mis le Roi en echec on l'annule
+                                {
+                                    javax.swing.JOptionPane.showMessageDialog(null,"Si vous déplacez cette pièce vous laissez ou mettez votre Roi en echec.");
+                                    plateauTemp.deplacerPiecePlateau(plateauTemp.getTabCases()[i][j],a,b);
+                                    this.peutJouer = false;
+                                }else{
                                     this.echec.mettreAJourDamier();
                                     this.echec.enleverCouleur();
                                     this.traitements(i,j);
                                 }
                             }else{
-                                boolean couleur = this.echec.getPartie().getPlateauJeu().getTabCases()[i][j].getPiece().isEstBlanc();
-                                if((couleur && this.echec.getPartie().getJoueurActuel()==0) || (!couleur && this.echec.getPartie().getJoueurActuel()==1))
-                                {
-                                    CaseG caseg = this.echec.getPartie().getPlateauJeu().getTabCases()[i][j];
-                                    if(!caseg.estVide()){
-                                        poss = caseg.getPiece().afficherPossibilitees(i,j,this.echec.getPartie().getPlateauJeu().getTabCases());
-                                        if(poss.size()!=0){
-                                            for(int k=0;k<poss.size();k++){
-                                                this.echec.getDamier()[poss.get(k).getX()][poss.get(k).getY()].setBackground(Color.green);
+                                if(plateauTemp.getTabCases()[i][j].getPiece()!=null){
+                                    boolean couleur = plateauTemp.getTabCases()[i][j].getPiece().isEstBlanc();
+                                    if((couleur && this.echec.getPartie().getJoueurActuel()==0) || (!couleur && this.echec.getPartie().getJoueurActuel()==1))
+                                    {
+                                        CaseG caseg;
+                                        caseg = plateauTemp.getTabCases()[i][j];
+                                        poss = caseg.getPiece().afficherPossibilitees(i,j,plateauTemp);
+                                        if(!caseg.estVide()){
+                                            if(poss.size()!=0){
+                                                for(int k=0;k<poss.size();k++){
+                                                    this.echec.getDamier()[poss.get(k).getX()][poss.get(k).getY()].setBackground(Color.green);
+                                                }
+                                                CaseG caseTemp = plateauTemp.getTabCases()[i][j];
+                                                if(caseTemp.getPiece().getNom().equals("Roi")){
+                                                    this.echec.afficherRoquePossible(caseTemp.getPiece().isEstBlanc(),i);
+                                                }
+                                                caseADeplac = caseg;
+                                                this.peutJouer= true;
                                             }
-                                            caseADeplac = caseg;
-                                            this.peutJouer= true;
                                         }
+                                    }else{
+                                        javax.swing.JOptionPane.showMessageDialog(null,"Ce n'est pas votre pion.");
                                     }
-                                }else{
-                                    javax.swing.JOptionPane.showMessageDialog(null,"Ce n'est pas votre pion.");
                                 }
                             }
                         }
@@ -61,43 +89,45 @@ public class CaseListener implements ActionListener {
                 }
             }
         }else{
-            javax.swing.JOptionPane.showMessageDialog(null,"Vous n'avez pas encore selectionné si vous vouliez jouer contre l'IA ou non.");
+            javax.swing.JOptionPane.showMessageDialog(null,"Pas de partie en cours. Selectionnez si vous souhaitez jouer contre l'IA ou non.");
         }
     }
 
     public void traitements(int i,int j){
-        //Tout les traitements
-
+        PlateauG plateauTemp = this.echec.getPartie().getPlateauJeu();
+        //TRAITEMENTS
         //Promotion pion
         if(this.echec.getPartie().derniereLigne(i)
-                && this.echec.getPartie().getPlateauJeu().getTabCases()[i][j].getPiece().getNom().contains("Pion")){
-            this.echec.getPartie().getPlateauJeu().pionPromotion(i,j,false);
-            this.echec.mettreAJourDamier();
+                && plateauTemp.getTabCases()[i][j].getPiece().getNom().contains("Pion")){
+            plateauTemp.pionPromotion(i,j,false);
         }
-        this.peutJouer = false;
-
-        if(this.echec.isIAactive()){
-            this.echec.getPartie().setJoueurActuel(1);//necessaire pour traitement promotion
-            //traitement du tour de l'IA
-
-
-
-            //---------------Promotion
-            if(this.echec.getPartie().derniereLigne(i)
-                    && this.echec.getPartie().getPlateauJeu().getTabCases()[i][j].getPiece().getNom().contains("Pion")){
-                this.echec.getPartie().getPlateauJeu().pionPromotion(i,j,true);
-                this.echec.mettreAJourDamier();
-            }
-            //---------------
-            this.echec.getPartie().setJoueurActuel(0);
-
-        }else{
+        //Pion en passant
+        if(plateauTemp.priseEnPassant(i,j,(this.echec.getPartie().getJoueurActuel()==1)? false:true))
             this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
-        }
-        //Fin de partie
+
+        //Test de fin de partie
         if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
             this.echec.getPartie().setFinie(true);
             this.echec.setPartieACommencee(false);
+        }
+        this.echec.mettreAJourDamier();
+        this.echec.mettreRoiRouge(true);
+        this.echec.mettreRoiRouge(false);
+        this.peutJouer = false;
+
+        //Tour de l'IA
+        if(this.echec.getPartie().isIntelligenceArtificielle()){
+            this.echec.getPartie().tourIA(i,j);
+            //---------------
+            this.echec.mettreAJourDamier();
+            this.echec.getPartie().setJoueurActuel(0);
+            //Fin de partie
+            if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
+                this.echec.getPartie().setFinie(true);
+                this.echec.setPartieACommencee(false);
+            }
+        }else{
+            this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
         }
     }
 }

@@ -1,5 +1,10 @@
 package JeuGraphique;
 
+import Pieces.Piece;
+
+import java.util.LinkedList;
+import java.util.Random;
+
 public class PartieG {
     private PlateauG plateauJeu;
     private JoueurG j1;
@@ -67,6 +72,10 @@ public class PartieG {
             //afichage gagnant
             return true;
         }
+        if(this.plateauJeu.getCompteurToursSansPrises()==50){
+            javax.swing.JOptionPane.showMessageDialog(null,"Partie nulle : 50 tours sans prise ont été joués");
+            return true;
+        }
         if(estEnEchecEtMatPartie())
             return true;
         else{
@@ -94,9 +103,49 @@ public class PartieG {
         return false;
     }
 
-    public void tourIA(){
+    public void tourIA(int i, int j){
+        this.setJoueurActuel(1);//necessaire pour traitement promotion
+        //traitement du tour de l'IA
         TourPartieG t = new TourPartieG();
-        t.choixIA();
+        LinkedList<CaseG> possibilites;
+        Piece piece;
+        int x,y;
+        do{
+            do{
+                t.choixIA();
+                x = t.getLigne();
+                y = t.getColonne();
+            }//la pièce choisie appartient bien au joueur et n'est pas null
+            while ((this.plateauJeu.getTabCases()[x][y].getPiece()== null) ||this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc());
+            possibilites = this.plateauJeu.getTabCases()[x][y].getPiece().afficherPossibilitees(x,y,this.plateauJeu);
+        }
+        while(possibilites.size() == 0);
+        //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
+
+        //CHOIX DU DEPLACEMENT PARMI LES POSSIBILITES
+        int a ;
+        Random rnd = new Random();
+        int xFinal,yFinal;
+        //Si le Roi de l'adversaire appartient aux déplacements on le mange
+        do {//On choisie une nouvelle possibilité de déplacement tant que celle-ci met le Roi en echec
+            a = rnd.nextInt(possibilites.size()) + 1;
+            System.out.println("Haaaaaaaa");
+            xFinal = possibilites.get(a-1).getX(); // a-1 car le joueur saisi entre [1,8] et non [0,7]
+            yFinal = possibilites.get(a-1).getY();
+        }while (this.plateauJeu.simulationDeplacement(this.plateauJeu.getTabCases()[x][y],xFinal,yFinal,this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc()));
+
+        //GESTION DU DEPLACEMENT
+        String nom = this.plateauJeu.getTabCases()[x][y].getPiece().getNom();
+        t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au TourPartie
+        t.setColonneDeplacFinal(yFinal);
+        this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
+        //this.echec.getPartie().listeTourParties.add(t);
+
+        //---------------Promotion
+        if(derniereLigne(i)
+                && this.plateauJeu.getTabCases()[i][j].getPiece().getNom().contains("Pion")){
+            this.plateauJeu.pionPromotion(i,j,true);
+        }
 
     }
 

@@ -5,6 +5,7 @@ import javax.swing.*;
 public class JoueurG {
     private String pseudo;
     private int partiesGagnees;
+    private boolean aRoque=false;
 
     /**
      * Constructeur de la classe

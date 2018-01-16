@@ -64,43 +64,15 @@ public class CaseG {
 
     /**
      *
-     * @param tabJeu
-     * @return Liste des Cases possibles de déplacement selon la case courante
-     */
-    public LinkedList<CaseG> afficherPossibilites(CaseG[][] tabJeu, boolean IA){
-        LinkedList<CaseG> poss;
-        int a;
-        char lettre;
-        poss = this.piece.afficherPossibilitees(this.x,this.y,tabJeu);
-        if(!IA){
-            if(poss.size() != 0) {
-                System.out.println("Possibilitées de déplacement");
-                for(int i = 0; i<poss.size();i++){
-                    if(poss.get(i)!=null){
-                        a = poss.get(i).getY()+1;
-                        lettre = (char) (a + 'a' -1);
-                        System.out.println((i + 1) + ") Coordonnées : " +(8 - poss.get(i).getX()) + "  " + lettre);
-                    }
-                }
-            }
-        }
-        return poss;
-    }
-
-    /**
-     *
      * @return vrai si la case est vide (si elle ne contient pas de pièce)
      */
     public boolean estVide(){
         return (this.piece == null ||  this.piece.isEstMange() ); //ou l'ancienne piece a été mangée ou la case est vide
     }
 
-    public boolean appartientAPossibilites(LinkedList<CaseG> poss,int x,int y){
-        for(int i=0;i<poss.size();i++){
-            System.out.println(poss.get(i).getX()+" " + poss.get(i).getY());
-            if(poss.get(i).getX() == x && poss.get(i).getY()==y){
-                return true;
-            }
+    public boolean appartientAPossibilites(LinkedList<CaseG> poss,int  x, int y, PlateauG plateau){
+        if(poss.contains(plateau.getTabCases()[x][y])){
+            return true;
         }
         return false;
     }

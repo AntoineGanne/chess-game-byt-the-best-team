@@ -1,6 +1,7 @@
 package JeuGraphique;
 import Listener.ButtonListener;
 import Listener.CaseListener;
+import com.sun.javafx.geom.Vec2d;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,11 +13,14 @@ public class FenetreJeu extends JFrame{
     private JButton[][] damier = new JButton[8][8];
     private Color white = new Color(250, 232, 218);
     private Color black = new  Color(180, 145, 94) ;
+    private Color rouge = new Color(255, 146, 146);
     private JPanel echiquier;
     private JPanel menu;
     private JButton IA;
     private JButton deuxJoueurs;
     private JButton recommencer;
+    private JButton petitRoque;
+    private JButton grandRoque;
     private boolean partieACommencee;
     private PartieG partie;
     private boolean IAactive;
@@ -61,16 +65,10 @@ public class FenetreJeu extends JFrame{
         //Boutons
         deuxJoueurs= new JButton("Jouer à 2 joueurs");
         deuxJoueurs.addActionListener(buttonListener);
-        deuxJoueurs.setVerticalTextPosition(SwingConstants.CENTER);
-        deuxJoueurs.setHorizontalTextPosition(SwingConstants.CENTER);
         IA = new JButton("Jouer contre l'IA");
         IA.addActionListener(buttonListener);
         recommencer = new JButton("Recommencer");
         recommencer.addActionListener(buttonListener);
-        recommencer.setVerticalTextPosition(SwingConstants.CENTER);
-        recommencer.setHorizontalTextPosition(SwingConstants.CENTER);
-        IA.setVerticalTextPosition(SwingConstants.CENTER);
-        IA.setHorizontalTextPosition(SwingConstants.CENTER);
         recommencer.setBackground(Color.white);
         deuxJoueurs.setBackground(Color.white);
         IA.setBackground(Color.white);
@@ -126,8 +124,10 @@ public class FenetreJeu extends JFrame{
         }
     }
 
-    public void mettreRoiRouge(){//si il est en echec
-
+    public void mettreRoiRouge(boolean blanc){//si il est en echec
+        Vec2d posRoi = this.getPartie().getPlateauJeu().positionRoi(blanc);
+        if(posRoi != null && this.getPartie().getPlateauJeu().estEnEchec(blanc))
+            damier[(int)posRoi.x][(int)posRoi.y].setBackground(this.rouge);
     }
 
     public void enleverCouleur(){
@@ -144,6 +144,17 @@ public class FenetreJeu extends JFrame{
     public void nouvellePartie(){
         this.partie = new PartieG();
         this.mettreAJourDamier();
+    }
+
+    public void afficherRoquePossible(boolean blanc, int ligne){
+        if(this.getPartie().getPlateauJeu().petitRoquePossible(blanc)){
+                damier[ligne][6].setBackground(Color.GREEN);
+                damier[ligne][6].setText("Roque");
+        }
+        if(this.getPartie().getPlateauJeu().grandRoquePossible(blanc)){
+            damier[ligne][2].setBackground(Color.GREEN);
+            damier[ligne][2].setText("Roque");
+        }
     }
 
     public JButton[][] getDamier() {

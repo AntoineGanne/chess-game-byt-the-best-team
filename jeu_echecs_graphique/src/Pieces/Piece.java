@@ -1,5 +1,6 @@
 package Pieces;
 import JeuGraphique.CaseG;
+import JeuGraphique.PlateauG;
 
 import java.util.LinkedList;
 
@@ -7,8 +8,7 @@ public class Piece{
     private String nom;
     private boolean estBlanc;
     private boolean estMange;
-    private String imageB;
-    private String imageN;
+    private boolean positionInitiale = true;
 
     /**
      * 
@@ -18,16 +18,12 @@ public class Piece{
         this.estBlanc = blanc;
         this.estMange = false;
         this.nom = nom;
-        this.imageB = imageB;
-        this.imageN = imageN;
     }
 
     public Piece(Piece piece) {
         this.nom = piece.nom;
         this.estBlanc = piece.estBlanc;
         this.estMange = piece.estMange;
-        this.imageB = piece.imageB;
-        this.imageN = piece.imageN;
     }
 
     public void setEstMange(boolean estMange) {
@@ -51,7 +47,15 @@ public class Piece{
         this.estMange = true;
     }
 
-    public LinkedList<CaseG> afficherPossibilitees(int x, int y, CaseG[][] tabJeu){
+    public boolean isPositionInitiale() {
+        return positionInitiale;
+    }
+
+    public void setPositionInitiale(boolean positionInitiale) {
+        this.positionInitiale = positionInitiale;
+    }
+
+    public LinkedList<CaseG> afficherPossibilitees(int x, int y, PlateauG plateau){
         LinkedList<CaseG> casesPossibles = new LinkedList<CaseG>();
         return casesPossibles;
     }
