@@ -17,6 +17,13 @@ public class TourPartieG {
         this.colonneDeplacFinal = -1;
     }
 
+    public TourPartieG(int l,int c,int lf,int lc) {
+        this.ligne = l;
+        this.colonne = c;
+        this.ligneDeplacFinal = lf;
+        this.colonneDeplacFinal = lc;
+    }
+
     /**
      * getteur de la ligne
      */

@@ -28,7 +28,7 @@ public class CaseListener implements ActionListener {
         PlateauG plateauTemp = this.echec.getPartie().getPlateauJeu();
         Object source = e.getSource();
         if(this.echec.isPartieACommencee()){
-            if(!this.echec.getPartie().isFinie()){
+            if(!this.echec.getPartie().estFinie()){
                 if(!this.peutJouer){
                     this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
                 }
@@ -43,20 +43,20 @@ public class CaseListener implements ActionListener {
                                 boolean blanc = caseADeplac.getPiece().isEstBlanc();
                                 if(caseADeplac.appartientAPossibilites(poss,i,j,plateauTemp)){
                                     //Si la case choisie comme déplacement appartient aux possibilités
-                                    plateauTemp.deplacerPiecePlateau(caseADeplac,i,j);
+                                    if(!plateauTemp.simulationDeplacement(caseADeplac,i,j,blanc)){
+                                        plateauTemp.deplacerPiecePlateau(caseADeplac,i,j);
+                                        this.echec.mettreAJourDamier();
+                                        this.echec.enleverCouleur();
+                                        this.traitements(i,j);
+                                    }
+                                    else{
+                                        javax.swing.JOptionPane.showMessageDialog(null,"Si vous déplacez cette pièce vous laissez ou mettez votre Roi en echec.");
+                                        this.peutJouer = false;
+                                        caseADeplac = null;
+                                    }
                                 }else if(this.echec.getDamier()[i][j].getText().equals("Roque")){//Cas particulier car le Roque n'appartient pas aux possibilités
                                     plateauTemp.effectuerRoque((j==2),blanc);
                                     this.echec.getDamier()[(blanc)?7:0][j].setText("");//On enlève le mot Roque
-                                }
-                                if(plateauTemp.estEnEchec(blanc)) //Si notre déplacement a mis le Roi en echec on l'annule
-                                {
-                                    javax.swing.JOptionPane.showMessageDialog(null,"Si vous déplacez cette pièce vous laissez ou mettez votre Roi en echec.");
-                                    plateauTemp.deplacerPiecePlateau(plateauTemp.getTabCases()[i][j],a,b);
-                                    this.peutJouer = false;
-                                }else{
-                                    this.echec.mettreAJourDamier();
-                                    this.echec.enleverCouleur();
-                                    this.traitements(i,j);
                                 }
                             }else{
                                 if(plateauTemp.getTabCases()[i][j].getPiece()!=null){
@@ -66,7 +66,11 @@ public class CaseListener implements ActionListener {
                                         CaseG caseg;
                                         caseg = plateauTemp.getTabCases()[i][j];
                                         poss = caseg.getPiece().afficherPossibilitees(i,j,plateauTemp);
-                                        if(!caseg.estVide()){
+                                        if(caseg.tousDeplacementsMiseEnEchec(plateauTemp)){
+                                            javax.swing.JOptionPane.showMessageDialog(null,"Si vous bougez cette pièce votre Roi reste ou sera mis en danger.");
+                                            this.peutJouer = false;
+                                            caseg = null;
+                                        }else if(!caseg.estVide()){
                                             if(poss.size()!=0){
                                                 for(int k=0;k<poss.size();k++){
                                                     this.echec.getDamier()[poss.get(k).getX()][poss.get(k).getY()].setBackground(Color.green);
@@ -105,6 +109,10 @@ public class CaseListener implements ActionListener {
         if(plateauTemp.priseEnPassant(i,j,(this.echec.getPartie().getJoueurActuel()==1)? false:true))
             this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
 
+        //On ajoute le tour effectué dans la liste de tours joués de la partie en cours
+        TourPartieG tour = new TourPartieG(caseADeplac.getX(),caseADeplac.getY(),i,j);
+        this.echec.getPartie().getListeTourParties().add(tour);
+
         //Test de fin de partie
         if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
             this.echec.getPartie().setFinie(true);
@@ -117,11 +125,11 @@ public class CaseListener implements ActionListener {
 
         //Tour de l'IA
         if(this.echec.getPartie().isIntelligenceArtificielle()){
+            this.echec.getPartie().setJoueurActuel(1);
             this.echec.getPartie().tourIA(i,j);
-            //---------------
             this.echec.mettreAJourDamier();
             this.echec.getPartie().setJoueurActuel(0);
-            //Fin de partie
+            //Test de fin de partie
             if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
                 this.echec.getPartie().setFinie(true);
                 this.echec.setPartieACommencee(false);
@@ -131,3 +139,4 @@ public class CaseListener implements ActionListener {
         }
     }
 }
+

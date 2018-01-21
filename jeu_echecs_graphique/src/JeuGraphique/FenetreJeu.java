@@ -137,6 +137,7 @@ public class FenetreJeu extends JFrame{
                     damier[i][j].setBackground(black);
                 else
                     damier[i][j].setBackground(white);
+                damier[i][j].setText("");
             }
         }
     }

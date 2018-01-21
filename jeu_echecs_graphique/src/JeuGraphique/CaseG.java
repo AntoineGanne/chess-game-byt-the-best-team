@@ -77,4 +77,13 @@ public class CaseG {
         return false;
     }
 
+    public boolean tousDeplacementsMiseEnEchec(PlateauG plateau){
+        LinkedList<CaseG> poss = this.getPiece().afficherPossibilitees(this.getX(),this.getY(),plateau);
+        for(int i=0;i<poss.size();i++){
+            if(!plateau.simulationDeplacement(this,poss.get(i).getX(),poss.get(i).getY(),this.getPiece().isEstBlanc()))
+                return false;
+        }
+        return true;
+    }
+
 }

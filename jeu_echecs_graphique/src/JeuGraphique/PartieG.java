@@ -11,7 +11,7 @@ public class PartieG {
     private JoueurG j2;
     private int joueurActuel; //0 pour blanc, 1 pour noir
     private boolean finie;
-    //private LinkedList<TourPartieG> listeTourParties = new LinkedList<TourPartieG>();
+    private LinkedList<TourPartieG> listeTourParties = new LinkedList<TourPartieG>();
     private boolean intelligenceArtificielle; //à 1 si le joueur veut jouer contre l'intelligenec artificielle
 
 
@@ -54,7 +54,12 @@ public class PartieG {
         this.intelligenceArtificielle = intelligenceArtificielle;
     }
 
+    public LinkedList<TourPartieG> getListeTourParties() {
+        return listeTourParties;
+    }
+
     public boolean derniereLigne(int x){
+        System.out.println(x);
         boolean blanc = (joueurActuel == 0)? true:false;
         if(blanc)
             return x==0;
@@ -81,9 +86,16 @@ public class PartieG {
         else{
             if(this.getPlateauJeu().estEnEchec(true))
                 javax.swing.JOptionPane.showMessageDialog(null,"Le Roi BLANC est en ECHEC.");
-
             if(this.getPlateauJeu().estEnEchec(false))
                 javax.swing.JOptionPane.showMessageDialog(null,"Le Roi NOIR est en ECHEC.");
+            if(estEnPat(true)){
+                javax.swing.JOptionPane.showMessageDialog(null,"Le Roi BLANC est en PAT. Partie finie.");
+                return true;
+            }
+            if(estEnPat(false)){
+                javax.swing.JOptionPane.showMessageDialog(null,"Le Roi NOIR est en PAT. Partie finie.");
+                return true;
+            }
 
         }
         return false;
@@ -103,11 +115,26 @@ public class PartieG {
         return false;
     }
 
+    public boolean estEnPat(boolean blanc){
+        for(int i =0;i<this.plateauJeu.getTAILLE();i++){
+            for(int j=0;j<this.plateauJeu.getTAILLE();j++){
+                if(this.plateauJeu.getTabCases()[i][j].getPiece() != null ){
+                    boolean couleurBlanc = this.plateauJeu.getTabCases()[i][j].getPiece().isEstBlanc();
+                    boolean memeCouleur = (couleurBlanc && blanc) || (!couleurBlanc && !blanc);
+                    if(memeCouleur && !this.plateauJeu.getTabCases()[i][j].tousDeplacementsMiseEnEchec(this.plateauJeu))
+                        return false;
+                }
+            }
+        }
+        return true;
+    }
+
     public void tourIA(int i, int j){
         this.setJoueurActuel(1);//necessaire pour traitement promotion
         //traitement du tour de l'IA
         TourPartieG t = new TourPartieG();
         LinkedList<CaseG> possibilites;
+        CaseG[][] tabTemp = this.getPlateauJeu().getTabCases();
         Piece piece;
         int x,y;
         do{
@@ -116,8 +143,8 @@ public class PartieG {
                 x = t.getLigne();
                 y = t.getColonne();
             }//la pièce choisie appartient bien au joueur et n'est pas null
-            while ((this.plateauJeu.getTabCases()[x][y].getPiece()== null) ||this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc());
-            possibilites = this.plateauJeu.getTabCases()[x][y].getPiece().afficherPossibilitees(x,y,this.plateauJeu);
+            while ((tabTemp[x][y].getPiece()== null) || tabTemp[x][y].getPiece().isEstBlanc() || tabTemp[x][y].tousDeplacementsMiseEnEchec(this.plateauJeu));
+            possibilites = tabTemp[x][y].getPiece().afficherPossibilitees(x,y,this.plateauJeu);
         }
         while(possibilites.size() == 0);
         //on choisi bien une pièce qui peut se déplacer (par exemple le roi s'il n'et pas encerclé)
@@ -129,22 +156,21 @@ public class PartieG {
         //Si le Roi de l'adversaire appartient aux déplacements on le mange
         do {//On choisie une nouvelle possibilité de déplacement tant que celle-ci met le Roi en echec
             a = rnd.nextInt(possibilites.size()) + 1;
-            System.out.println("Haaaaaaaa");
             xFinal = possibilites.get(a-1).getX(); // a-1 car le joueur saisi entre [1,8] et non [0,7]
             yFinal = possibilites.get(a-1).getY();
-        }while (this.plateauJeu.simulationDeplacement(this.plateauJeu.getTabCases()[x][y],xFinal,yFinal,this.plateauJeu.getTabCases()[x][y].getPiece().isEstBlanc()));
+        }while(this.plateauJeu.simulationDeplacement(tabTemp[x][y],xFinal,yFinal,tabTemp[x][y].getPiece().isEstBlanc()));
 
         //GESTION DU DEPLACEMENT
         String nom = this.plateauJeu.getTabCases()[x][y].getPiece().getNom();
         t.setLigneDeplacFinal(xFinal); //on rajoute ces informations de deplacement au TourPartie
         t.setColonneDeplacFinal(yFinal);
         this.plateauJeu.deplacerPiecePlateau(this.plateauJeu.getTabCases()[x][y],xFinal, yFinal);
-        //this.echec.getPartie().listeTourParties.add(t);
+        this.listeTourParties.add(t);
 
         //---------------Promotion
-        if(derniereLigne(i)
-                && this.plateauJeu.getTabCases()[i][j].getPiece().getNom().contains("Pion")){
-            this.plateauJeu.pionPromotion(i,j,true);
+        if(derniereLigne(xFinal)
+                && this.plateauJeu.getTabCases()[xFinal][yFinal].getPiece().getNom().contains("Pion")){
+            this.plateauJeu.pionPromotion(xFinal,yFinal,true);
         }
 
     }

@@ -81,7 +81,7 @@ public class PlateauG {
     public void demanderEtChargerFichier(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
-        String fichier = "cRoque.txt";
+        String fichier = "config.txt";
         String [] mot;
 
         BufferedReader ficTexte;
@@ -205,12 +205,14 @@ public class PlateauG {
         int a = caseADeplacer.getX();
         int b = caseADeplacer.getY();
 
-        if(a != xFinal && b!=yFinal){ //si on ne déplace pas sur la même case
+        if(a != xFinal || b!=yFinal){ //si on ne déplace pas sur la même case
             //On effectue le déplacement
             plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
             plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
         }
-        return plateauTemp.estEnEchec(xFinal,yFinal,blanc);
+        int fsd =2;
+        int fdfsd = 3;
+        return plateauTemp.estEnEchec(blanc);
     }
     /**
      *
@@ -253,7 +255,7 @@ public class PlateauG {
         if(posRoi!= null){
             return estEnEchec((int)posRoi.x,(int)posRoi.y,blanc);
         }
-        return true; // au cas ou il manque un Roi sur la configuration chargée (ne devrait pas manquer)
+        return true; // au cas ou il manque un Roi sur la configuration chargée (ne devrait pas manquer sauf erreur fichier)
     }
 
 
@@ -411,12 +413,12 @@ public class PlateauG {
             LinkedList<CaseG> possPionPrise= new LinkedList<>(); //pion de l'adversaire qui peuvent prendre en passant
             int ligne = (blanc)? 4:3;
 
-            if(this.getTabCases()[ligne][j+1].getPiece() != null && this.getTabCases()[ligne][j+1].getPiece().getNom().equals("Pion")){
+            if(j+1 <= 7 && this.getTabCases()[ligne][j+1].getPiece() != null && this.getTabCases()[ligne][j+1].getPiece().getNom().equals("Pion")){
                 boolean couleur1 = this.getTabCases()[ligne][j+1].getPiece().isEstBlanc();
                 if((blanc)? !couleur1:couleur1)
                     possPionPrise.add(this.getTabCases()[ligne][j+1]);
             }
-            if(this.getTabCases()[ligne][j-1].getPiece() != null && this.getTabCases()[ligne][j-1].getPiece().getNom().equals("Pion")){
+            if(j-1 >= 0 && this.getTabCases()[ligne][j-1].getPiece() != null && this.getTabCases()[ligne][j-1].getPiece().getNom().equals("Pion")){
                 boolean couleur2 = this.getTabCases()[ligne][j-1].getPiece().isEstBlanc();
                 if((blanc)? couleur2:!couleur2)
                     possPionPrise.add(this.getTabCases()[ligne][j-1]);
