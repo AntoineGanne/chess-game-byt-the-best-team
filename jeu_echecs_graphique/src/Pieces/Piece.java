@@ -4,7 +4,7 @@ import JeuGraphique.PlateauG;
 
 import java.util.LinkedList;
 
-public class Piece{
+public abstract class Piece{
     private String nom;
     private boolean estBlanc;
     private boolean estMange;

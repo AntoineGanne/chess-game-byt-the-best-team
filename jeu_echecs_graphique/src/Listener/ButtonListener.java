@@ -27,6 +27,7 @@ public class ButtonListener implements ActionListener{
         }
         else if(source == this.echec.getRecommencer()){
             this.echec.getPartie().setFinie(false);
+            this.echec.setPartieACommencee(false);
             this.echec.nouvellePartie();
             this.echec.enleverCouleur();
         }

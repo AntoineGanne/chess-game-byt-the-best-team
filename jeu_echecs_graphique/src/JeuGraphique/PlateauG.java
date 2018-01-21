@@ -6,6 +6,7 @@ import Pieces.Cavalier;
 import com.sun.javafx.geom.Vec2d;
 
 import javax.swing.*;
+import javax.swing.filechooser.*;
 import java.util.*;
 
 import java.util.LinkedList;
@@ -17,6 +18,9 @@ public class PlateauG {
     private boolean roiBlancMort;
     private boolean roiNoirMort;
     private int compteurToursSansPrises; //La partie est finie si 50 coups sans prises ont été joués à la suite
+    private boolean aRoqueBlanc=false;
+    private boolean aRoqueNoir=false;
+
 
     public PlateauG(int taille) {
         this.TAILLE = taille;
@@ -25,7 +29,7 @@ public class PlateauG {
         this.roiBlancMort = false;
         this.roiNoirMort = false;
         this.compteurToursSansPrises = 0;
-        this.demanderEtChargerFichier();
+        this.chargerConfiguration();
     }
 
     public PlateauG(PlateauG p) {
@@ -40,9 +44,21 @@ public class PlateauG {
         this.compteurToursSansPrises = p.getCompteurToursSansPrises();
     }
 
+    /**
+     * Demande un fichier de configuration présent sur l'ordinateur.
+     * @return le nom du fichier
+     */
     public String demanderConfiguration(){
+        int retour = -1;
         JFileChooser dialogue = new JFileChooser();
-        dialogue.showOpenDialog(null);
+        dialogue.getFileSystemView();
+        do{
+            dialogue.setAcceptAllFileFilterUsed(false);
+            FileNameExtensionFilter ff = new FileNameExtensionFilter("Fichiers texte", "txt");
+            dialogue.setFileFilter(ff);
+            retour = dialogue.showOpenDialog(null);
+        }while(retour != JFileChooser.APPROVE_OPTION);
+
         return dialogue.getSelectedFile().getAbsolutePath();
     }
 
@@ -68,7 +84,7 @@ public class PlateauG {
     }
 
     /**
-     * On crée toutes les pièces du jeu d'echec et on les initialises sur le plateau de jeu.
+     * On initialises le plateau de jeu.
      */
     public void initialiserPlateau(){
         for(int i = 0;i<TAILLE;i++) {
@@ -78,7 +94,10 @@ public class PlateauG {
         }
     }
 
-    public void demanderEtChargerFichier(){
+    /**
+     * On charge le plateau avec les pièces inscrites sur le fichier de configuration.
+     */
+    public void chargerConfiguration(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
         String fichier = "config.txt";
@@ -100,8 +119,6 @@ public class PlateauG {
                 String lettre = "";
                 String[] position;
                 int a,b,i=0;
-
-                boolean estPiece; //si on traite la pièce ou sa position
                 Pion pion;
                 Dame dame;
                 Roi roi;
@@ -207,7 +224,7 @@ public class PlateauG {
 
         if(a != xFinal || b!=yFinal){ //si on ne déplace pas sur la même case
             //On effectue le déplacement
-            plateauTemp.tabCases[xFinal][yFinal].setPiece(new Piece(plateauTemp.tabCases[a][b].getPiece())); //la nouvelle pièce de la case est la notre
+            plateauTemp.tabCases[xFinal][yFinal].setPiece(plateauTemp.tabCases[a][b].getPiece()); //la nouvelle pièce de la case est la notre
             plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
         }
         int fsd =2;
@@ -352,6 +369,7 @@ public class PlateauG {
         Vec2d posRoi = positionRoi(blanc);
         int a = (int)posRoi.x;
         int b = (int)posRoi.y;
+        boolean roquePasEncoreJoue = (blanc)? !this.aRoqueBlanc:!this.aRoqueNoir;
         if(tabCases[a][b].getPiece().isPositionInitiale())
         {
             int ligne = (blanc)? 7:0; //Le roque s'effectue sur la ligne de départ
@@ -364,7 +382,7 @@ public class PlateauG {
             }else{
                 return false;
             }
-            return ((this.getTabCases()[ligne][7].getPiece() != null) && this.getTabCases()[ligne][7].getPiece().getNom().equals("Tour") && this.getTabCases()[ligne][7].getPiece().isPositionInitiale());
+            return ((roquePasEncoreJoue && this.getTabCases()[ligne][7].getPiece() != null) && this.getTabCases()[ligne][7].getPiece().getNom().equals("Tour") && this.getTabCases()[ligne][7].getPiece().isPositionInitiale());
         }
         return false;
     }
@@ -374,6 +392,7 @@ public class PlateauG {
         int ligne = (blanc)? 7:0; //Le roque s'effectue sur la ligne de départ
         int a = (int)posRoi.x;
         int b = (int)posRoi.y;
+        boolean roquePasEncoreJoue = (blanc)? !this.aRoqueBlanc:!this.aRoqueNoir;
         if(tabCases[a][b].getPiece().isPositionInitiale())
         {
             if(posRoi!=null && a==ligne && b == 4){
@@ -384,7 +403,7 @@ public class PlateauG {
             }else{
                 return false;
             }
-            return (this.getTabCases()[ligne][0].getPiece() != null) && this.getTabCases()[ligne][0].getPiece().getNom().contains("Tour");
+            return (roquePasEncoreJoue && this.getTabCases()[ligne][0].getPiece() != null) && this.getTabCases()[ligne][0].getPiece().getNom().contains("Tour");
         }else
             return false;
     }
@@ -404,12 +423,17 @@ public class PlateauG {
             deplacerPiecePlateau(this.getTabCases()[ligne][4],ligne,6); //On déplace le Roi
             deplacerPiecePlateau(this.getTabCases()[ligne][0],ligne,5); //On déplace la Tour
         }
+        if(blanc)
+            this.aRoqueBlanc = false;
+        else
+            this.aRoqueNoir = false;
 
     }
 
-    public boolean priseEnPassant(int i, int j, boolean blanc){
+    public boolean priseEnPassant(int i, int j, boolean blanc, boolean IA){
         boolean deuxCaseDepl = (blanc)? (i==4):(i==3);
-        if(this.getTabCases()[i][j].getPiece().getNom().equals("Pion") && deuxCaseDepl){
+        int option = -10,choix = -10;
+        if(this.getTabCases()[i][j].getPiece()!= null && this.getTabCases()[i][j].getPiece().getNom().equals("Pion") && deuxCaseDepl){
             LinkedList<CaseG> possPionPrise= new LinkedList<>(); //pion de l'adversaire qui peuvent prendre en passant
             int ligne = (blanc)? 4:3;
 
@@ -420,23 +444,28 @@ public class PlateauG {
             }
             if(j-1 >= 0 && this.getTabCases()[ligne][j-1].getPiece() != null && this.getTabCases()[ligne][j-1].getPiece().getNom().equals("Pion")){
                 boolean couleur2 = this.getTabCases()[ligne][j-1].getPiece().isEstBlanc();
-                if((blanc)? couleur2:!couleur2)
+                if((blanc)? !couleur2:couleur2)
                     possPionPrise.add(this.getTabCases()[ligne][j-1]);
             }
-            JOptionPane jop = new JOptionPane();
-            //DEMANDE AU JOUEUR
-            if(possPionPrise.size()!=0){
-                int option = jop.showConfirmDialog(null, "Voulez-vous prendre le pion de l'adversaire en passant ?", "Prise en passant", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                if(option == 0){
-                    Random rd = new Random();
-                    int l=rd.nextInt(possPionPrise.size());
-                    deplacerPiecePlateau(possPionPrise.get(l),i+1,j);
-                    return true;
+            if(IA){
+                Random randChoix = new Random();
+                choix = randChoix.nextInt(2);
+            }else{
+                JOptionPane jop = new JOptionPane();
+                //DEMANDE AU JOUEUR
+                if(possPionPrise.size()!=0){
+                    option = jop.showConfirmDialog(null, "Voulez-vous prendre le pion de l'adversaire en passant ?", "Prise en passant", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 }
-                else
-                    return false;
             }
-            return false;
+            if((option == 0 || choix == 0) && possPionPrise.size()!=0){
+                Random rd = new Random();
+                int l=rd.nextInt(possPionPrise.size());
+                deplacerPiecePlateau(possPionPrise.get(l),(blanc)? i+1:i-1,j);
+                this.getTabCases()[i][j].setPiece(null);
+                return true;
+            }
+            else
+                return false;
         }
         return false;
     }

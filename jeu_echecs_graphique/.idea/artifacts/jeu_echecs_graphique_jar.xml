@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="jeu_echecs_graphique:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/jeu_echecs_graphique_jar</output-path>
+    <root id="archive" name="jeu_echecs_graphique.jar">
+      <element id="module-output" name="jeu_echecs_graphique" />
+    </root>
+  </artifact>
+</component>

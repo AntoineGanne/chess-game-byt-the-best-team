@@ -1,1 +1,0 @@
-white k e4 p1 f7 black q d3 q d4 q d5 q e3 q e5 q f3 q f4 q f5 k a8

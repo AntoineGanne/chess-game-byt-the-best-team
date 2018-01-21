@@ -28,7 +28,7 @@ public class CaseListener implements ActionListener {
         PlateauG plateauTemp = this.echec.getPartie().getPlateauJeu();
         Object source = e.getSource();
         if(this.echec.isPartieACommencee()){
-            if(!this.echec.getPartie().estFinie()){
+            if(!this.echec.getPartie().isFinie()){
                 if(!this.peutJouer){
                     this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
                 }
@@ -66,11 +66,7 @@ public class CaseListener implements ActionListener {
                                         CaseG caseg;
                                         caseg = plateauTemp.getTabCases()[i][j];
                                         poss = caseg.getPiece().afficherPossibilitees(i,j,plateauTemp);
-                                        if(caseg.tousDeplacementsMiseEnEchec(plateauTemp)){
-                                            javax.swing.JOptionPane.showMessageDialog(null,"Si vous bougez cette pièce votre Roi reste ou sera mis en danger.");
-                                            this.peutJouer = false;
-                                            caseg = null;
-                                        }else if(!caseg.estVide()){
+                                        if(!caseg.estVide()){
                                             if(poss.size()!=0){
                                                 for(int k=0;k<poss.size();k++){
                                                     this.echec.getDamier()[poss.get(k).getX()][poss.get(k).getY()].setBackground(Color.green);
@@ -82,6 +78,10 @@ public class CaseListener implements ActionListener {
                                                 caseADeplac = caseg;
                                                 this.peutJouer= true;
                                             }
+                                        }else if(caseg.tousDeplacementsMiseEnEchec(plateauTemp)){
+                                            javax.swing.JOptionPane.showMessageDialog(null,"Si vous bougez cette pièce votre Roi reste ou sera mis en danger.");
+                                            this.peutJouer = false;
+                                            caseg = null;
                                         }
                                     }else{
                                         javax.swing.JOptionPane.showMessageDialog(null,"Ce n'est pas votre pion.");
@@ -106,7 +106,8 @@ public class CaseListener implements ActionListener {
             plateauTemp.pionPromotion(i,j,false);
         }
         //Pion en passant
-        if(plateauTemp.priseEnPassant(i,j,(this.echec.getPartie().getJoueurActuel()==1)? false:true))
+        //Si l'IA joue elle choisie de prendre ou non notre pion en passant
+        if(plateauTemp.priseEnPassant(i,j,(this.echec.getPartie().getJoueurActuel()==1)? false:true,this.echec.getPartie().isIntelligenceArtificielle()))
             this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
 
         //On ajoute le tour effectué dans la liste de tours joués de la partie en cours
@@ -124,10 +125,13 @@ public class CaseListener implements ActionListener {
         this.peutJouer = false;
 
         //Tour de l'IA
-        if(this.echec.getPartie().isIntelligenceArtificielle()){
+        if(this.echec.getPartie().isIntelligenceArtificielle() && this.echec.getPartie().getJoueurActuel()==0){
             this.echec.getPartie().setJoueurActuel(1);
             this.echec.getPartie().tourIA(i,j);
             this.echec.mettreAJourDamier();
+            this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
+            this.echec.mettreRoiRouge(true); //Met en rouge la case du Roi blanc si il est en echec
+            this.echec.mettreRoiRouge(false); //Respectivement du Roi noir.
             this.echec.getPartie().setJoueurActuel(0);
             //Test de fin de partie
             if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){

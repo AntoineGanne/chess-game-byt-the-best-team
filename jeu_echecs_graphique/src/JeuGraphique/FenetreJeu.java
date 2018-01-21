@@ -19,12 +19,8 @@ public class FenetreJeu extends JFrame{
     private JButton IA;
     private JButton deuxJoueurs;
     private JButton recommencer;
-    private JButton petitRoque;
-    private JButton grandRoque;
     private boolean partieACommencee;
     private PartieG partie;
-    private boolean IAactive;
-    //private JLabel informationLabel;
 
     public FenetreJeu(){
         super("Le Super Jeu d'Echecs !");
@@ -38,7 +34,6 @@ public class FenetreJeu extends JFrame{
         this.setResizable(false);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
 
 
 
@@ -91,19 +86,6 @@ public class FenetreJeu extends JFrame{
 
         this.nouvellePartie();
 
-    }
-
-    public static void main(String[] args){
-        FenetreJeu jeu = new FenetreJeu();
-        jeu.setVisible(true);
-    }
-
-    public boolean isIAactive() {
-        return IAactive;
-    }
-
-    public void setIAactive(boolean IAactive) {
-        this.IAactive = IAactive;
     }
 
     public void mettreAJourDamier(){
@@ -183,4 +165,10 @@ public class FenetreJeu extends JFrame{
     }
 
     public JButton getRecommencer() { return recommencer; }
+
+    public static void main(String[] args){
+        FenetreJeu jeu = new FenetreJeu();
+        jeu.setVisible(true);
+    }
+
 }

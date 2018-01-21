@@ -59,7 +59,6 @@ public class PartieG {
     }
 
     public boolean derniereLigne(int x){
-        System.out.println(x);
         boolean blanc = (joueurActuel == 0)? true:false;
         if(blanc)
             return x==0;
@@ -173,6 +172,9 @@ public class PartieG {
             this.plateauJeu.pionPromotion(xFinal,yFinal,true);
         }
 
+        //---------------Prise en passant
+        if(this.plateauJeu.priseEnPassant(i,j,true,false)) //C'est le joueur qui décide de prendre en passant le pion de l'IA
+            this.setJoueurActuel((this.getJoueurActuel()==1)? 0:1);
     }
 
 }
