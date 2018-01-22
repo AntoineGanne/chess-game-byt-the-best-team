@@ -100,7 +100,7 @@ public class PlateauG {
     public void chargerConfiguration(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
-        String fichier = "config.txt";
+        String fichier = "cRoque.txt";
         String [] mot;
 
         BufferedReader ficTexte;
@@ -421,12 +421,12 @@ public class PlateauG {
             deplacerPiecePlateau(this.getTabCases()[ligne][0],ligne,3); //On déplace la Tour
         }else{
             deplacerPiecePlateau(this.getTabCases()[ligne][4],ligne,6); //On déplace le Roi
-            deplacerPiecePlateau(this.getTabCases()[ligne][0],ligne,5); //On déplace la Tour
+            deplacerPiecePlateau(this.getTabCases()[ligne][7],ligne,5); //On déplace la Tour
         }
         if(blanc)
-            this.aRoqueBlanc = false;
+            this.aRoqueBlanc = true;
         else
-            this.aRoqueNoir = false;
+            this.aRoqueNoir = true;
 
     }
 

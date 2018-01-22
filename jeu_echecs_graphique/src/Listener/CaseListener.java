@@ -57,6 +57,10 @@ public class CaseListener implements ActionListener {
                                 }else if(this.echec.getDamier()[i][j].getText().equals("Roque")){//Cas particulier car le Roque n'appartient pas aux possibilités
                                     plateauTemp.effectuerRoque((j==2),blanc);
                                     this.echec.getDamier()[(blanc)?7:0][j].setText("");//On enlève le mot Roque
+                                    this.echec.mettreAJourDamier();
+                                    this.echec.enleverCouleur();
+                                    this.traitements(i,j);
+
                                 }
                             }else{
                                 if(plateauTemp.getTabCases()[i][j].getPiece()!=null){

@@ -22,3 +22,11 @@ Architecture
 /jeu_echecs_graphique 	/img Contient les images des pièces noires et blanches du plateau
 						/src 
 						
+						
+						
+-----------------------------------------
+Compilation et execution
+
+- Choix 1 : ouvrir un terminal, se placer dans le repertoir du projet /jeu_echecs_graphique, taper la commande "java -jar jeu_echecs_graphique.jar"
+- Choix 2 : cliquer sur jeu_echecs_graphique.jar
+- Choix 3: compiler les sources dans un IDE.					
