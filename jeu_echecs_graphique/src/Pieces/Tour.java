@@ -14,45 +14,19 @@ public class Tour extends Piece{
 
         LinkedList<CaseG> casesPossibles = new LinkedList<>();
 
-        //Verticalement
-        int i =1;
-        while(x+i<=7){
-            if(plateau.getTabCases()[x+i][y].estVide() || (!plateau.getTabCases()[x+i][y].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x+i][y].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x+i][y].getPiece().isEstBlanc())))){
-                    casesPossibles.add(plateau.getTabCases()[x+i][y]);
-            }
-            if(!plateau.getTabCases()[x+i][y].estVide())
-                break; //on affiche pas les cases qui sont derrière une case occupée (la tour ne peut pas sauter par dessus une case)
-            i++;
-        }
-        i=1;
-        while(x-i>=0){
-            if(plateau.getTabCases()[x-i][y].estVide() || (!plateau.getTabCases()[x-i][y].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x-i][y].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x-i][y].getPiece().isEstBlanc())))){
-                    casesPossibles.add(plateau.getTabCases()[x-i][y]);
-            }
-            if(!plateau.getTabCases()[x-i][y].estVide())
-                break; //on affiche pas les cases qui sont derrière une case occupée (la tour ne peut pas sauter par dessus une case)
-            i++;
+        //parcour a la verticale
+        for(int xOffset=-1;xOffset<=1;xOffset++)
+        {
+            ajouterPossibilitéesSelonUneDirection(xOffset,0,x,y,plateau,casesPossibles);
         }
 
-        //Horizontalement
-        int j =1;
-        while(y+j<=7){
-            if(plateau.getTabCases()[x][y+j].estVide() || (!plateau.getTabCases()[x][y+j].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x][y+j].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x][y+j].getPiece().isEstBlanc())))){
-                    casesPossibles.add(plateau.getTabCases()[x][y+j]);
-            }
-            if(!plateau.getTabCases()[x][y+j].estVide())
-                break; //on affiche pas les cases qui sont derrière une case occupée (la tour ne peut pas sauter par dessus une case)
-            j++;
+        //parcour a l'horizontale
+        for(int yOffset=-1;yOffset<=1;yOffset+=2)
+        {
+            ajouterPossibilitéesSelonUneDirection(0,yOffset,x,y,plateau,casesPossibles);
         }
-        j=1;
-        while(y-j>=0){
-            if(plateau.getTabCases()[x][y-j].estVide() || (!plateau.getTabCases()[x][y-j].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x][y-j].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x][y-j].getPiece().isEstBlanc())))){
-                    casesPossibles.add(plateau.getTabCases()[x][y-j]);
-            }
-            if(!plateau.getTabCases()[x][y-j].estVide())
-                break; //on affiche pas les cases qui sont derrière une case occupée (la tour ne peut pas sauter par dessus une case)
-            j++;
-        }
+
+
 
         return casesPossibles;
     }

@@ -17,30 +17,35 @@ public class Cavalier extends Piece {
 
         LinkedList<CaseG> casesPossibles = new LinkedList<CaseG>();
 
-        if(x-2 >= 0 && y-1 >= 0 && (plateau.getTabCases()[x-2][y-1].estVide() || (!plateau.getTabCases()[x-2][y-1].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x-2][y-1].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x-2][y-1].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x-2][y-1]);
+        for(int xOffset=-2;xOffset<=2;xOffset+=4){
+            for(int yOffset=-1;yOffset<=1;yOffset+=2){
+                int xTemp = x+xOffset;
+                int yTemp = y+yOffset;
+                if(xTemp>=0 && xTemp < 8 && yTemp>=0 && yTemp<8){
+                    boolean b_estVide =plateau.getTabCases()[xTemp][yTemp].estVide();
+                    if(b_estVide || positionDePionAdverse(xTemp,yTemp,plateau)){
+                        casesPossibles.add(plateau.getTabCases()[xTemp][yTemp]);
+                    }
+                }
+
+            }
         }
-        if(x-1 >= 0 && y-2 >= 0 && (plateau.getTabCases()[x-1][y-2].estVide() || (!plateau.getTabCases()[x-1][y-2].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x-1][y-2].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x-1][y-2].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x-1][y-2]);
+
+        for(int yOffset=-2;yOffset<=2;yOffset+=4){
+            for(int xOffset=-1;xOffset<=1;xOffset+=2){
+                int xTemp = x+xOffset;
+                int yTemp = y+yOffset;
+                if(xTemp>=0 && xTemp < 8 && yTemp>=0 && yTemp<8){
+                    boolean b_estVide =plateau.getTabCases()[xTemp][yTemp].estVide();
+                    if(b_estVide || positionDePionAdverse(xTemp,yTemp,plateau)){
+                        casesPossibles.add(plateau.getTabCases()[xTemp][yTemp]);
+                    }
+                }
+
+            }
         }
-        if(x+2 <= 7 && y-1 >= 0 && (plateau.getTabCases()[x+2][y-1].estVide() || (!plateau.getTabCases()[x+2][y-1].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x+2][y-1].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x+2][y-1].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x+2][y-1]);
-        }
-        if(x-2 >= 0 && y+1 <= 7 && (plateau.getTabCases()[x-2][y+1].estVide() || (!plateau.getTabCases()[x-2][y+1].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x-2][y+1].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x-2][y+1].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x-2][y+1]);
-        }
-        if(x-1 >= 0 && y+2 <= 7 && (plateau.getTabCases()[x-1][y+2].estVide() || (!plateau.getTabCases()[x-1][y+2].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x-1][y+2].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x-1][y+2].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x-1][y+2]);
-        }
-        if(x+2 <= 7 && y+1 <= 7 && (plateau.getTabCases()[x+2][y+1].estVide() || (!plateau.getTabCases()[x+2][y+1].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x+2][y+1].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x+2][y+1].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x+2][y+1]);
-        }
-        if(x+1 <= 7 && y+2 <= 7 && (plateau.getTabCases()[x+1][y+2].estVide() || (!plateau.getTabCases()[x+1][y+2].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x+1][y+2].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x+1][y+2].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x+1][y+2]);
-        }
-        if(x+1 <= 7 && y-2 >= 0 && (plateau.getTabCases()[x+1][y-2].estVide() || (!plateau.getTabCases()[x+1][y-2].estVide() && ((this.isEstBlanc() &&!plateau.getTabCases()[x+1][y-2].getPiece().isEstBlanc()) || (!this.isEstBlanc() &&plateau.getTabCases()[x+1][y-2].getPiece().isEstBlanc()))))){
-            casesPossibles.add(plateau.getTabCases()[x+1][y-2]);
-        }
+
+
         return casesPossibles;
     }
 }

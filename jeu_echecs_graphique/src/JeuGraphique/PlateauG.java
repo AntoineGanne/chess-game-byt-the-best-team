@@ -100,7 +100,7 @@ public class PlateauG {
     public void chargerConfiguration(){
         String ligne = "";
         //String fichier = this.demanderConfiguration();
-        String fichier = "cRoque.txt";
+        String fichier = "configBase.txt";
         String [] mot;
 
         BufferedReader ficTexte;
