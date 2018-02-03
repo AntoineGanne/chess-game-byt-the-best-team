@@ -8,7 +8,7 @@ import java.util.LinkedList;
 public class Fou extends Piece {
 
     public Fou(boolean blanc){
-        super(blanc,"Fou","fouB.png","fouN.png");
+        super(blanc,"Fou");
     }
 
 
@@ -21,7 +21,7 @@ public class Fou extends Piece {
         {
             for(int yOffset=-1;yOffset<=1;yOffset+=2)
             {
-                ajouterPossibilitéesSelonUneDirection(xOffset,yOffset,x,y,plateau,casesPossibles);
+                ajouterPossibiliteesSelonUneDirection(xOffset,yOffset,x,y,plateau,casesPossibles);
             }
         }
         return casesPossibles;

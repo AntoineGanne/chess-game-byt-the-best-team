@@ -1,0 +1,1 @@
+black p1 a7 k h8 white p1 b5 k a1

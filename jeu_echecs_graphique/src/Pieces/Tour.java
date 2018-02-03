@@ -7,7 +7,7 @@ import java.util.LinkedList;
 
 public class Tour extends Piece{
     public Tour(boolean blanc){
-        super(blanc,"Tour","tourB.png","tourN.png");
+        super(blanc,"Tour");
     }
 
     public LinkedList<CaseG> afficherPossibilitees(int x, int y, PlateauG plateau){
@@ -17,13 +17,13 @@ public class Tour extends Piece{
         //parcour a la verticale
         for(int xOffset=-1;xOffset<=1;xOffset++)
         {
-            ajouterPossibilitéesSelonUneDirection(xOffset,0,x,y,plateau,casesPossibles);
+            ajouterPossibiliteesSelonUneDirection(xOffset,0,x,y,plateau,casesPossibles);
         }
 
         //parcour a l'horizontale
         for(int yOffset=-1;yOffset<=1;yOffset+=2)
         {
-            ajouterPossibilitéesSelonUneDirection(0,yOffset,x,y,plateau,casesPossibles);
+            ajouterPossibiliteesSelonUneDirection(0,yOffset,x,y,plateau,casesPossibles);
         }
 
 

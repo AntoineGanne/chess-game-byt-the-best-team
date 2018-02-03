@@ -22,23 +22,45 @@ public class FenetreJeu extends JFrame{
     private boolean partieACommencee;
     private PartieG partie;
 
+    /**
+     * Constructeur de la classe.
+     */
     public FenetreJeu(){
         super("Le Super Jeu d'Echecs !");
-        this.partieACommencee = false;
         this.echiquier = new JPanel();
-        menu = new JPanel();
-        menu.setLayout(new GridLayout(8,1));
-        Container contenu = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
-
+        this.menu = new JPanel();
         this.setSize(1000,700);
         this.setResizable(false);
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
+        //Boutons
+        deuxJoueurs= new JButton("Jouer à 2 joueurs");
+        IA = new JButton("Jouer contre l'IA");
+        recommencer = new JButton("Recommencer");
 
+        this.initialiserJeu();
+    }
 
+    /**
+     * Initialise tous les composants de notre fenetre.
+     */
+    public void initialiserJeu(){
+        this.partieACommencee = false;
+        menu.setLayout(new GridLayout(8,1));
         ActionListener caseListener = new CaseListener(this);
         ActionListener buttonListener = new ButtonListener(this);
+
+
+        //BOUTONS
+        deuxJoueurs.addActionListener(buttonListener);
+        IA.addActionListener(buttonListener);
+        recommencer.addActionListener(buttonListener);
+        recommencer.setBackground(Color.white);
+        deuxJoueurs.setBackground(Color.white);
+        IA.setBackground(Color.white);
+
+        //ECHIQUIER
         echiquier.setLayout(new GridLayout(8,8));
         echiquier.setBorder(BorderFactory.createLineBorder(new Color(135, 73, 28),15));
 
@@ -57,37 +79,31 @@ public class FenetreJeu extends JFrame{
             }
         }
 
-        //Boutons
-        deuxJoueurs= new JButton("Jouer à 2 joueurs");
-        deuxJoueurs.addActionListener(buttonListener);
-        IA = new JButton("Jouer contre l'IA");
-        IA.addActionListener(buttonListener);
-        recommencer = new JButton("Recommencer");
-        recommencer.addActionListener(buttonListener);
-        recommencer.setBackground(Color.white);
-        deuxJoueurs.setBackground(Color.white);
-        IA.setBackground(Color.white);
-        //informationLabel = new JLabel("Bienvenue sur le Super jeu d'Echecs !");
-
+        //TITRE
         titre.setBounds(100,50,200,25);
         titre.setFont(new Font("Consolas", Font.PLAIN,24));
 
-        menu.add(titre);
-        menu.add(this.deuxJoueurs);
-        menu.add(this.IA);
-        menu.add(this.recommencer);
-        //menu.add(this.informationLabel);
-
+        //AJOUT AU PANEL
+        this.menu.add(titre);
+        this.menu.add(this.deuxJoueurs);
+        this.menu.add(this.IA);
+        this.menu.add(this.recommencer);
         this.menu.setBackground(new Color(250, 232, 218));
+
+        Container contenu = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         contenu.add(menu);
         contenu.add(echiquier);
         this.setContentPane(contenu);
 
-
+        //PARTIE
         this.nouvellePartie();
 
     }
 
+
+    /**
+     * Met a jour le damier en affichant l'image correspondant a la Piece de chaque case.
+     */
     public void mettreAJourDamier(){
         String nom;
         String couleur;
@@ -106,12 +122,19 @@ public class FenetreJeu extends JFrame{
         }
     }
 
+    /**
+     * Met en rouge le roi d'une couelur donnee selon si il est ene echec ou non.
+     * @param blanc couleur du joueur
+     */
     public void mettreRoiRouge(boolean blanc){//si il est en echec
         Vec2d posRoi = this.getPartie().getPlateauJeu().positionRoi(blanc);
         if(posRoi != null && this.getPartie().getPlateauJeu().estEnEchec(blanc))
             damier[(int)posRoi.x][(int)posRoi.y].setBackground(this.rouge);
     }
 
+    /**
+     * Enleve toutes les couleurs de notre damier.
+     */
     public void enleverCouleur(){
         for(int i = 0; i<8;i++){
             for(int j=0;j<8;j++){
@@ -124,11 +147,22 @@ public class FenetreJeu extends JFrame{
         }
     }
 
+    /**
+     * Initialise une nouvelle partie.
+     */
     public void nouvellePartie(){
         this.partie = new PartieG();
         this.mettreAJourDamier();
+        //Partie utile si on charge une configuaration
+        this.mettreRoiRouge(true);
+        this.mettreRoiRouge(false);
     }
 
+    /**
+     * Affiche les mots "Roque" sur le plateau lorsque le roi peut faire un roque.
+     * @param blanc couleur du joueur
+     * @param ligne ligne du Roi
+     */
     public void afficherRoquePossible(boolean blanc, int ligne){
         if(this.getPartie().getPlateauJeu().petitRoquePossible(blanc)){
                 damier[ligne][6].setBackground(Color.GREEN);
@@ -140,32 +174,64 @@ public class FenetreJeu extends JFrame{
         }
     }
 
+    /**
+     * Renvoie le damier de jeu.
+     * @return boolean
+     */
     public JButton[][] getDamier() {
         return damier;
     }
 
+    /**
+     * Retourne le bouton qui permet de mettre a jour si on joue contre l'IA.
+     * @return boolean
+     */
     public JButton getIA() {
         return IA;
     }
 
+    /**
+     * Retourne le bouton qui permet de mettre a jour si on joue contre un autre joueur.
+     * @return boolean
+     */
     public JButton getDeuxJoueurs() {
         return deuxJoueurs;
     }
 
+    /**
+     * Retourne l'etat de l'attribut partieACommence
+     * @return boolean
+     */
     public boolean isPartieACommencee() {
         return partieACommencee;
     }
 
+    /**
+     *
+     * @param partieACommencee boolean
+     */
     public void setPartieACommencee(boolean partieACommencee) {
         this.partieACommencee = partieACommencee;
     }
 
+    /**
+     *
+     * @return PartieG
+     */
     public PartieG getPartie() {
         return partie;
     }
 
+    /**
+     *
+     * @return JButton
+     */
     public JButton getRecommencer() { return recommencer; }
 
+    /**
+     * Methode principale
+     * @param args String[]
+     */
     public static void main(String[] args){
         FenetreJeu jeu = new FenetreJeu();
         jeu.setVisible(true);

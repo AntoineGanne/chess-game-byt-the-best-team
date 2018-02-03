@@ -7,37 +7,39 @@ import java.util.LinkedList;
 public abstract class Piece{
     private String nom;
     private boolean estBlanc;
-    private boolean estMange;
     private boolean positionInitiale = true;
 
     /**
-     * 
+     *
      * @param blanc boolean si la piece est blanche
+     * @param nom nom de la piece
      */
-    public Piece(boolean blanc, String nom, String imageB, String imageN) {
+    public Piece(boolean blanc, String nom) {
         this.estBlanc = blanc;
-        this.estMange = false;
         this.nom = nom;
     }
 
+    /**
+     *
+     * @param piece Piece
+     */
     public Piece(Piece piece) {
         this.nom = piece.nom;
         this.estBlanc = piece.estBlanc;
-        this.estMange = piece.estMange;
     }
 
     /**
      * fonction utilisée par les pieces Dame,Fou et Tour
      * ajoute a la liste casesPossibles les deplacements possible de la piece a la position (x,y)
      * selon la direction donnée par directionX et direction Y
-     * @param directionX
-     * @param directionY
-     * @param x
-     * @param y
-     * @param plateau
-     * @param casesPossibles
+     * @param directionX int
+     * @param directionY int
+     * @param x ligne
+     * @param y colonne
+     * @param plateau plateau de jeu
+     * @param casesPossibles possiblites de deplacement
      */
-    protected void ajouterPossibilitéesSelonUneDirection(int directionX, int directionY,int x,int y,PlateauG plateau, LinkedList<CaseG> casesPossibles)
+    protected void ajouterPossibiliteesSelonUneDirection(int directionX, int directionY,int x,int y,PlateauG plateau, LinkedList<CaseG> casesPossibles)
     {
         if(!(directionX==0 && directionY==0)){
             boolean pieceNonAtteinte = true;  //pour sortir de la boucle après avoir atteint une pièce
@@ -58,48 +60,55 @@ public abstract class Piece{
 
     /**
      * sert a tester la position donnée durant le calcul des deplacements possibles
-     * @warning ne doit pas etre appelée sur une case ne contenant pas de piece
-     * @param x
-     * @param y
-     * @param plateau
+     * cette méthode ne doit pas etre appelée sur une case ne contenant pas de piece
+     * @param x ligne
+     * @param y colonne
+     * @param plateau plateau de jeu
      * @return vrai si la position donnée est occupée par un pion adverse
      */
     protected boolean positionDePionAdverse(int x,int y,PlateauG plateau)
     {
-        return (this.isEstBlanc() ? !plateau.getTabCases()[x][y].getPiece().isEstBlanc() : plateau.getTabCases()[x][y].getPiece().isEstBlanc());
+        return (this.isEstBlanc() != plateau.getTabCases()[x][y].getPiece().isEstBlanc());
     }
 
-    public void setEstMange(boolean estMange) {
-        this.estMange = estMange;
-    }
-
-    public boolean isEstMange() {
-        return estMange;
-    }
-
+    /**
+     *
+     * @return boolean
+     */
     public boolean isEstBlanc() {
         return estBlanc;
     }
 
-
+    /**
+     *
+     * @return String
+     */
     public String getNom() {
         return nom;
     }
 
-    public void mangerPiece(){
-        this.estMange = true;
-    }
-
+    /**
+     *
+     * @return boolean
+     */
     public boolean isPositionInitiale() {
         return positionInitiale;
     }
 
+    /**
+     *
+     * @param positionInitiale boolean
+     */
     public void setPositionInitiale(boolean positionInitiale) {
         this.positionInitiale = positionInitiale;
     }
 
-    public LinkedList<CaseG> afficherPossibilitees(int x, int y, PlateauG plateau){
-        LinkedList<CaseG> casesPossibles = new LinkedList<CaseG>();
-        return casesPossibles;
-    }
+    /**
+     *
+     * @param x int
+     * @param y int
+     * @param plateau PlateauG
+     * @return possibilites ded deplacement de la piece donnee
+     */
+    public abstract LinkedList<CaseG> afficherPossibilitees(int x, int y, PlateauG plateau);
 }

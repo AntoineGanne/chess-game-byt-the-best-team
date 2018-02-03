@@ -28,7 +28,9 @@ public class CaseListener implements ActionListener {
         PlateauG plateauTemp = this.echec.getPartie().getPlateauJeu();
         Object source = e.getSource();
         if(this.echec.isPartieACommencee()){
-            if(!this.echec.getPartie().isFinie()){
+            if(this.testDeFinPartie()){
+                this.echec.enleverCouleur();
+            }else{
                 if(!this.peutJouer){
                     this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
                 }
@@ -45,8 +47,7 @@ public class CaseListener implements ActionListener {
                                     //Si la case choisie comme déplacement appartient aux possibilités
                                     if(!plateauTemp.simulationDeplacement(caseADeplac,i,j,blanc)){
                                         plateauTemp.deplacerPiecePlateau(caseADeplac,i,j);
-                                        this.echec.mettreAJourDamier();
-                                        this.echec.enleverCouleur();
+                                        this.misesAJour();
                                         this.traitements(i,j);
                                     }
                                     else{
@@ -57,10 +58,8 @@ public class CaseListener implements ActionListener {
                                 }else if(this.echec.getDamier()[i][j].getText().equals("Roque")){//Cas particulier car le Roque n'appartient pas aux possibilités
                                     plateauTemp.effectuerRoque((j==2),blanc);
                                     this.echec.getDamier()[(blanc)?7:0][j].setText("");//On enlève le mot Roque
-                                    this.echec.mettreAJourDamier();
-                                    this.echec.enleverCouleur();
+                                    this.misesAJour();
                                     this.traitements(i,j);
-
                                 }
                             }else{
                                 if(plateauTemp.getTabCases()[i][j].getPiece()!=null){
@@ -109,42 +108,53 @@ public class CaseListener implements ActionListener {
                 && plateauTemp.getTabCases()[i][j].getPiece().getNom().contains("Pion")){
             plateauTemp.pionPromotion(i,j,false);
         }
-        //Pion en passant
-        //Si l'IA joue elle choisie de prendre ou non notre pion en passant
-        if(plateauTemp.priseEnPassant(i,j,(this.echec.getPartie().getJoueurActuel()==1)? false:true,this.echec.getPartie().isIntelligenceArtificielle()))
-            this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
+        //Prise en passant
+        if(!this.echec.getPartie().isIntelligenceArtificielle()){
+            if(plateauTemp.priseEnPassant(i,j, this.echec.getPartie().getJoueurActuel() != 1,false))
+                this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
+        }else{
+            if(plateauTemp.priseEnPassant(i,j,true,true))
+            {
+                javax.swing.JOptionPane.showMessageDialog(null,"Prise en passant.");
+                this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
+            }
+        }
 
         //On ajoute le tour effectué dans la liste de tours joués de la partie en cours
         TourPartieG tour = new TourPartieG(caseADeplac.getX(),caseADeplac.getY(),i,j);
         this.echec.getPartie().getListeTourParties().add(tour);
 
-        //Test de fin de partie
-        if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
-            this.echec.getPartie().setFinie(true);
-            this.echec.setPartieACommencee(false);
-        }
-        this.echec.mettreAJourDamier();
-        this.echec.mettreRoiRouge(true);
-        this.echec.mettreRoiRouge(false);
+        this.testDeFinPartie();
+        this.misesAJour();
         this.peutJouer = false;
+
 
         //Tour de l'IA
         if(this.echec.getPartie().isIntelligenceArtificielle() && this.echec.getPartie().getJoueurActuel()==0){
             this.echec.getPartie().setJoueurActuel(1);
             this.echec.getPartie().tourIA(i,j);
-            this.echec.mettreAJourDamier();
-            this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
-            this.echec.mettreRoiRouge(true); //Met en rouge la case du Roi blanc si il est en echec
-            this.echec.mettreRoiRouge(false); //Respectivement du Roi noir.
+            this.misesAJour();
             this.echec.getPartie().setJoueurActuel(0);
-            //Test de fin de partie
-            if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
-                this.echec.getPartie().setFinie(true);
-                this.echec.setPartieACommencee(false);
-            }
+            this.testDeFinPartie();
         }else{
             this.echec.getPartie().setJoueurActuel((this.echec.getPartie().getJoueurActuel()==1)? 0:1);
         }
+    }
+
+    public void misesAJour(){
+        this.echec.mettreAJourDamier();
+        this.echec.enleverCouleur(); //Enlève les couleurs du tour précendent
+        this.echec.mettreRoiRouge(true); //Met en rouge la case du Roi blanc si il est en echec
+        this.echec.mettreRoiRouge(false); //Respectivement du Roi noir.
+    }
+
+    public boolean testDeFinPartie(){
+        //Test de fin de partie
+        if(this.echec.getPartie().estFinie() || this.echec.getPartie().estEnEchecEtMatPartie()){
+            this.echec.setPartieACommencee(false);
+            return true;
+        }
+        return false;
     }
 }
 

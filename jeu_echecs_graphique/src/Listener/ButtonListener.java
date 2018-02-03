@@ -3,6 +3,7 @@ package Listener;
 import java.awt.event.*;
 
 import JeuGraphique.FenetreJeu;
+import JeuGraphique.JoueurG;
 
 public class ButtonListener implements ActionListener{
     private FenetreJeu echec;
@@ -19,7 +20,8 @@ public class ButtonListener implements ActionListener{
             this.echec.setPartieACommencee(true);
             this.echec.getPartie().setFinie(false);
             this.echec.getPartie().setIntelligenceArtificielle(false);
-
+            this.echec.getPartie().setJ1(new JoueurG(1));
+            this.echec.getPartie().setJ2(new JoueurG(2));
         }else if(source == this.echec.getIA()){
             this.echec.setPartieACommencee(true);
             this.echec.getPartie().setFinie(false);

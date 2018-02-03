@@ -8,7 +8,7 @@ import java.util.LinkedList;
 public class Dame extends Piece {
 
     public Dame(boolean blanc){
-        super(blanc,"Dame","dameB.png","dameN.png");
+        super(blanc,"Dame");
     }
 
     public LinkedList<CaseG> afficherPossibilitees(int x, int y, PlateauG plateau){
@@ -21,7 +21,7 @@ public class Dame extends Piece {
         {
             for(int yOffset=-1;yOffset<=1;yOffset++)
             {
-                ajouterPossibilitéesSelonUneDirection(xOffset,yOffset,x,y,plateau,casesPossibles);
+                ajouterPossibiliteesSelonUneDirection(xOffset,yOffset,x,y,plateau,casesPossibles);
             }
         }
 

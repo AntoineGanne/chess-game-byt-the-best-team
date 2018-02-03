@@ -20,52 +20,107 @@ public class PartieG {
      */
     public PartieG(){
         this.plateauJeu = new PlateauG(8);
-        this.j1 = new JoueurG(1);
-        this.j2 = new JoueurG(2);
         this.joueurActuel = 0;
     }
 
 
+    /**
+     * Accesseur du plateau
+     * @return PlateauG
+     */
     public PlateauG getPlateauJeu() {
         return plateauJeu;
     }
 
+    /**
+     * Accesseur du JoueurActuel
+     * @return int
+     */
     public int getJoueurActuel() {
         return joueurActuel;
     }
 
+    /**
+     * Mutateur du joueurActuel
+     * @param joueurActuel int
+     */
     public void setJoueurActuel(int joueurActuel) {
         this.joueurActuel = joueurActuel;
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public boolean isFinie() {
         return finie;
     }
 
+    /**
+     *
+     * @param finie boolean
+     */
     public void setFinie(boolean finie) {
         this.finie = finie;
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public boolean isIntelligenceArtificielle() {
         return intelligenceArtificielle;
     }
 
+    /**
+     *
+     * @param intelligenceArtificielle boolean
+     */
     public void setIntelligenceArtificielle(boolean intelligenceArtificielle) {
         this.intelligenceArtificielle = intelligenceArtificielle;
     }
 
+    /**
+     *
+     * @param j1 JoueurG
+     */
+    public void setJ1(JoueurG j1) {
+        this.j1 = j1;
+    }
+
+    /**
+     *
+     * @param j2 JoueurG
+     */
+    public void setJ2(JoueurG j2) {
+        this.j2 = j2;
+    }
+
+    /**
+     *
+     * @return liste des tours deja effectues
+     */
     public LinkedList<TourPartieG> getListeTourParties() {
         return listeTourParties;
     }
 
+    /**
+     * Retourne vrai si la ligne entrée en paramêtre est la dernière ligne du plateau pour une couleur considérée
+     * @param x ligne du déplacement du pion
+     * @return boolean
+     */
     public boolean derniereLigne(int x){
-        boolean blanc = (joueurActuel == 0)? true:false;
+        boolean blanc = joueurActuel == 0;
         if(blanc)
             return x==0;
         else
             return x==7;
     }
 
+    /**
+     * Retourne vrai si la partie est finie et l'affiche.
+     * @return boolean
+     */
     public boolean estFinie(){
         if(this.plateauJeu.isRoiBlancMort()){
             javax.swing.JOptionPane.showMessageDialog(null,"Les Noirs ont gagnés ! Bravo !");
@@ -100,6 +155,10 @@ public class PartieG {
         return false;
     }
 
+    /**
+     * Retourne vrai si l'un des 2 roi est en echec et mat et l'affiche.
+     * @return boolean
+     */
     public boolean estEnEchecEtMatPartie(){
         if(this.plateauJeu.estEnEchecEtMat(true))
         {
@@ -114,6 +173,11 @@ public class PartieG {
         return false;
     }
 
+    /**
+     * Retourne vrai si le Roi d'une couleur donnée est en pat
+     * @param blanc couleur du joueur
+     * @return boolean
+     */
     public boolean estEnPat(boolean blanc){
         for(int i =0;i<this.plateauJeu.getTAILLE();i++){
             for(int j=0;j<this.plateauJeu.getTAILLE();j++){
@@ -128,6 +192,11 @@ public class PartieG {
         return true;
     }
 
+    /**
+     * Tous les traitements du tour de l'IA.
+     * @param i ligne
+     * @param j colonne
+     */
     public void tourIA(int i, int j){
         this.setJoueurActuel(1);//necessaire pour traitement promotion
         //traitement du tour de l'IA
@@ -173,8 +242,8 @@ public class PartieG {
         }
 
         //---------------Prise en passant
-        if(this.plateauJeu.priseEnPassant(i,j,true,false)) //C'est le joueur qui décide de prendre en passant le pion de l'IA
-            this.setJoueurActuel((this.getJoueurActuel()==1)? 0:1);
+        if(this.plateauJeu.priseEnPassant(xFinal,yFinal,false,false)) //C'est le joueur qui décide de prendre en passant le pion de l'IA
+            javax.swing.JOptionPane.showMessageDialog(null,"Prise en passant.");
     }
 
 }

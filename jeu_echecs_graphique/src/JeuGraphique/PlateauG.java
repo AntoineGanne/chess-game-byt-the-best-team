@@ -3,6 +3,7 @@ package JeuGraphique;
 import Pieces.*;
 
 import Pieces.Cavalier;
+import com.sun.istack.internal.NotNull;
 import com.sun.javafx.geom.Vec2d;
 
 import javax.swing.*;
@@ -22,6 +23,10 @@ public class PlateauG {
     private boolean aRoqueNoir=false;
 
 
+    /**
+     * Constructeur principal de la classe PlateauG.
+     * @param taille int
+     */
     public PlateauG(int taille) {
         this.TAILLE = taille;
         this.tabCases = new CaseG[taille][taille];
@@ -32,7 +37,11 @@ public class PlateauG {
         this.chargerConfiguration();
     }
 
-    public PlateauG(PlateauG p) {
+    /**
+     * Constructeur par copie de la classe PlateauG.
+     * @param p PlateauG
+     */
+    public PlateauG(@NotNull PlateauG p) {
         this.TAILLE = p.getTAILLE();
         this.tabCases = new CaseG[p.getTAILLE()][p.getTAILLE()];
         for(int i = 0; i<TAILLE; i++){
@@ -45,12 +54,14 @@ public class PlateauG {
     }
 
     /**
-     * Demande un fichier de configuration présent sur l'ordinateur.
+     * Demande un fichier de configuration present sur l'ordinateur.
      * @return le nom du fichier
      */
     public String demanderConfiguration(){
-        int retour = -1;
+        int retour;
+        String workingDir = System.getProperty("user.dir");
         JFileChooser dialogue = new JFileChooser();
+        dialogue.setCurrentDirectory(new File (workingDir));
         dialogue.getFileSystemView();
         do{
             dialogue.setAcceptAllFileFilterUsed(false);
@@ -62,23 +73,44 @@ public class PlateauG {
         return dialogue.getSelectedFile().getAbsolutePath();
     }
 
+    //GETTER ET SETTER
 
+    /**
+     *
+     * @return int
+     */
     public int getTAILLE() {
         return TAILLE;
     }
 
+    /**
+     *
+     * @return int
+     */
     public int getCompteurToursSansPrises() {
         return compteurToursSansPrises;
     }
 
+    /**
+     *
+     * @return CaseG[][]
+     */
     public CaseG[][] getTabCases() {
         return tabCases;
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public boolean isRoiBlancMort() {
         return roiBlancMort;
     }
 
+    /**
+     *
+     * @return boolean
+     */
     public boolean isRoiNoirMort() {
         return roiNoirMort;
     }
@@ -86,7 +118,7 @@ public class PlateauG {
     /**
      * On initialises le plateau de jeu.
      */
-    public void initialiserPlateau(){
+    private void initialiserPlateau(){
         for(int i = 0;i<TAILLE;i++) {
             for (int j = 0; j < TAILLE; j++) {
                 tabCases[i][j] = new CaseG(i,j,null);
@@ -95,21 +127,17 @@ public class PlateauG {
     }
 
     /**
-     * On charge le plateau avec les pièces inscrites sur le fichier de configuration.
+     * On charge le plateau avec les pieces inscrites sur le fichier de configuration.
      */
-    public void chargerConfiguration(){
+    private void chargerConfiguration(){
         String ligne = "";
-        //String fichier = this.demanderConfiguration();
-        String fichier = "configBase.txt";
+        String fichier = this.demanderConfiguration();
+       // String fichier = "configBase.txt";
         String [] mot;
 
         BufferedReader ficTexte;
         try {
             ficTexte = new BufferedReader(new FileReader(new File(fichier)));
-            if (ficTexte == null){
-                throw new FileNotFoundException("Fichier non trouvé : "
-                        + fichier);
-            }
             ligne = ficTexte.readLine();
             if (ligne != null) {
                 mot = ligne.split (" ");
@@ -176,23 +204,21 @@ public class PlateauG {
                 }
             }
             ficTexte.close();
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }
 
     /**
-     *
+     * Gère le deplacement d'une piece sur le plateau et ce que cela implique (manger une pièce de l'adversaire, changer l'état de la pièce,..)
      * @param xFinal coordonee finale x de la piece sur la grille
      * @param yFinal coordonee finale y de la piece sur la grille
+     * @param caseADeplacer CaseG
      */
     public void deplacerPiecePlateau(CaseG caseADeplacer, int xFinal, int yFinal){
         if(tabCases[xFinal][yFinal].getPiece()!= null) { //si la case du déplacement n'est pas vide
             System.out.println("Vous avez mangé une pièce de l'adversaire : " + tabCases[xFinal][yFinal].getPiece().getNom() + ".");
             this.compteurToursSansPrises = 0; //Une pièce a été mangée on remet le compteur à 0.
-            tabCases[xFinal][yFinal].getPiece().setEstMange(true); //la pièce de la case est mangée
 
             //On regarde si c'est le Roi d'une des couleurs qui est mort
             if(tabCases[xFinal][yFinal].getPiece().getNom() == "Roi"){
@@ -202,20 +228,21 @@ public class PlateauG {
                     this.roiNoirMort = true;
             }
 
-            caseADeplacer.getPiece().setPositionInitiale(false);
         }else
             this.compteurToursSansPrises++;
         tabCases[xFinal][yFinal].setPiece(caseADeplacer.getPiece()); //la nouvelle pièce de la case est la notre
+        caseADeplacer.getPiece().setPositionInitiale(false);
         caseADeplacer.setPiece(null); //l'ancienne case n'a plus de pièce
+
     }
 
     /**
-     * Cette fonction permet de savoir si un déplacement quelconque met notre propre roi en echec.
-     * @param caseADeplacer
-     * @param xFinal
-     * @param yFinal
-     * @param blanc
-     * @return
+     * Cette fonction permet de savoir si un deplacement quelconque met notre propre roi en echec.
+     * @param caseADeplacer Case
+     * @param xFinal ligne finale
+     * @param yFinal colonne finale
+     * @param blanc couleur du Joueur
+     * @return boolean
      */
     public boolean simulationDeplacement(CaseG caseADeplacer, int xFinal, int yFinal, boolean blanc){
         PlateauG plateauTemp = new PlateauG(this);
@@ -227,23 +254,21 @@ public class PlateauG {
             plateauTemp.tabCases[xFinal][yFinal].setPiece(plateauTemp.tabCases[a][b].getPiece()); //la nouvelle pièce de la case est la notre
             plateauTemp.tabCases[a][b].setPiece(null); //l'ancienne case n'a plus de pièce
         }
-        int fsd =2;
-        int fdfsd = 3;
         return plateauTemp.estEnEchec(blanc);
     }
     /**
      *
-     * @param x
-     * @param y
-     * @param blanc
-     * @return vrai si le roi de la couleur donnée est en echec a la position (x,y) donnée
+     * @param x ligne
+     * @param y colonne
+     * @param blanc couleur du Joueur
+     * @return vrai si le roi de la couleur donnee est en echec a la position (x,y) donnee
      */
     public boolean estEnEchec(int x, int y, boolean blanc){ //on pourra saisir les coordonnées des déplacement possibles du roi pour tester si il est en echec et mat
         LinkedList<CaseG> casesPossibles = new LinkedList<>();
         for(int i =0; i<TAILLE;i++){
             for(int j =0; j<TAILLE;j++){
                 // on s'intéresse aux pièces adverses
-                if((tabCases[i][j].getPiece() != null) && ((blanc)? !tabCases[i][j].getPiece().isEstBlanc():tabCases[i][j].getPiece().isEstBlanc())){
+                if((tabCases[i][j].getPiece() != null) && ((blanc) != tabCases[i][j].getPiece().isEstBlanc())){
                     casesPossibles.clear();
                     casesPossibles = tabCases[i][j].getPiece().afficherPossibilitees(i,j,this);
                     if(tabCases[i][j].getPiece().getNom().equals("Pion"))
@@ -263,9 +288,9 @@ public class PlateauG {
     }
 
     /**
-     *
-     * @param blanc
-     * @return vrai si le roi de la couleur donnée est en echec
+     * Retourne vrai si le roi de la couleur donnee est en echec
+     * @param blanc couleur du Joueur
+     * @return boolean
      */
     public boolean estEnEchec(boolean blanc){
         Vec2d posRoi=this.positionRoi(blanc);
@@ -277,9 +302,9 @@ public class PlateauG {
 
 
     /**
-     *
-     * @param blanc
-     * @return vrai si le roi de la couleur donnée est en echec et mat
+     * Retourne vrai si le roi de la couleur donnee est en echec et mat
+     * @param blanc couleur du Joueur
+     * @return boolean
      */
     public boolean estEnEchecEtMat(boolean blanc) {
         if(!this.isRoiBlancMort() && !this.isRoiNoirMort()){
@@ -305,23 +330,29 @@ public class PlateauG {
     }
 
     /**
-     *
-     * @param blanc
-     * @return un vecteur 2D contenant la position du Roi (de la couleur précisée par le boolean blanc) sur le plateau de jeu
+     * Retourne un vecteur 2D contenant la position du Roi (de la couleur precisée par le boolean blanc) sur le plateau de jeu
+     * @param blanc couleur du Joueur
+     * @return Vec2d
      */
     public Vec2d positionRoi(boolean blanc){
-        Vec2d position = null;
+        Vec2d position;
         for(int i =0; i<TAILLE;i++){
             for(int j =0; j<TAILLE;j++){
-                if(tabCases[i][j].getPiece()!= null && Objects.equals(tabCases[i][j].getPiece().getNom(), "Roi") && (blanc ? tabCases[i][j].getPiece().isEstBlanc():!tabCases[i][j].getPiece().isEstBlanc())){
+                if(tabCases[i][j].getPiece()!= null && Objects.equals(tabCases[i][j].getPiece().getNom(), "Roi") && (blanc == tabCases[i][j].getPiece().isEstBlanc())){
                     position = new Vec2d(i,j);
                     return position;
                 }
             }
         }
-        return position;
+        return null;
     }
 
+    /**
+     * Gere la promotion du pion lorsqu'il arrive en fin de ligne. Automatise pour l'IA.
+     * @param x coordonnée x du pion
+     * @param y coordonnée y du pion
+     * @param IA si c'est au tour de l'IA
+     */
     public void pionPromotion(int x, int y, boolean IA){
         String choix;
         boolean couleur;
@@ -333,7 +364,7 @@ public class PlateauG {
             choix = promotion[c];
         }else {
             JOptionPane jop = new JOptionPane(), jop2 = new JOptionPane();
-            String nom = (String)jop.showInputDialog(null,
+            String nom = (String) JOptionPane.showInputDialog(null,
                     "Vous souhaitez promouvoir votre pion en : ",
                     "PROMOTION !",
                     JOptionPane.QUESTION_MESSAGE,
@@ -365,6 +396,11 @@ public class PlateauG {
         }
     }
 
+    /**
+     * Retourne vrai si le petit Roque est possible pour le Roi.
+     * @param blanc couleur du Joueur
+     * @return boolean
+     */
     public boolean petitRoquePossible(boolean blanc){
         Vec2d posRoi = positionRoi(blanc);
         int a = (int)posRoi.x;
@@ -373,7 +409,7 @@ public class PlateauG {
         if(tabCases[a][b].getPiece().isPositionInitiale())
         {
             int ligne = (blanc)? 7:0; //Le roque s'effectue sur la ligne de départ
-            if(posRoi!=null && a==ligne && b == 4){
+            if(a == ligne && b == 4){
                 for(int i=1;i<3;i++){
                     if(!this.getTabCases()[ligne][4+i].estVide() || simulationDeplacement(tabCases[a][b],ligne,4+i,blanc)){
                         return false;
@@ -387,6 +423,11 @@ public class PlateauG {
         return false;
     }
 
+    /**
+     * Retourne vrai si le grand Roque est possible pour le Roi.
+     * @param blanc couleur du Joueur
+     * @return boolean
+     */
     public boolean grandRoquePossible(boolean blanc){
         Vec2d posRoi = positionRoi(blanc);
         int ligne = (blanc)? 7:0; //Le roque s'effectue sur la ligne de départ
@@ -395,7 +436,7 @@ public class PlateauG {
         boolean roquePasEncoreJoue = (blanc)? !this.aRoqueBlanc:!this.aRoqueNoir;
         if(tabCases[a][b].getPiece().isPositionInitiale())
         {
-            if(posRoi!=null && a==ligne && b == 4){
+            if(a == ligne && b == 4){
                 for(int i=-1;i>=-4;i--){
                     if(i+4!=0 && !this.getTabCases()[ligne][4+i].estVide())
                         return false;
@@ -403,16 +444,15 @@ public class PlateauG {
             }else{
                 return false;
             }
-            return (roquePasEncoreJoue && this.getTabCases()[ligne][0].getPiece() != null) && this.getTabCases()[ligne][0].getPiece().getNom().contains("Tour");
+            return (roquePasEncoreJoue && this.getTabCases()[ligne][0].getPiece() != null) && this.getTabCases()[ligne][0].getPiece().getNom().contains("Tour") && this.getTabCases()[ligne][0].getPiece().isPositionInitiale();
         }else
             return false;
     }
 
     /**
-     *
-     * @param grand
-     * @param blanc
-     * @return vrai si le roque a été effectué
+     * Cette methode permet d'effectuer le Roque.
+     * @param grand si c'est le grand Roque
+     * @param blanc la couleur du Roi
      */
     public void effectuerRoque(boolean grand, boolean blanc){
         int ligne = (blanc)? 7:0;
@@ -430,6 +470,14 @@ public class PlateauG {
 
     }
 
+    /**
+     * Gestion de la prise en passant du pion quand il se deplace de 2 cases et que l'adversaire peut le prendre sur la diagonale.
+     * @param i ligne
+     * @param j colonne
+     * @param blanc couleur du Joueur
+     * @param IA vrai si l'IA est active
+     * @return vrai si la prise en passant c'est effectuée
+     */
     public boolean priseEnPassant(int i, int j, boolean blanc, boolean IA){
         boolean deuxCaseDepl = (blanc)? (i==4):(i==3);
         int option = -10,choix = -10;
@@ -439,12 +487,12 @@ public class PlateauG {
 
             if(j+1 <= 7 && this.getTabCases()[ligne][j+1].getPiece() != null && this.getTabCases()[ligne][j+1].getPiece().getNom().equals("Pion")){
                 boolean couleur1 = this.getTabCases()[ligne][j+1].getPiece().isEstBlanc();
-                if((blanc)? !couleur1:couleur1)
+                if((blanc) != couleur1)
                     possPionPrise.add(this.getTabCases()[ligne][j+1]);
             }
             if(j-1 >= 0 && this.getTabCases()[ligne][j-1].getPiece() != null && this.getTabCases()[ligne][j-1].getPiece().getNom().equals("Pion")){
                 boolean couleur2 = this.getTabCases()[ligne][j-1].getPiece().isEstBlanc();
-                if((blanc)? !couleur2:couleur2)
+                if((blanc) != couleur2)
                     possPionPrise.add(this.getTabCases()[ligne][j-1]);
             }
             if(IA){
@@ -454,7 +502,7 @@ public class PlateauG {
                 JOptionPane jop = new JOptionPane();
                 //DEMANDE AU JOUEUR
                 if(possPionPrise.size()!=0){
-                    option = jop.showConfirmDialog(null, "Voulez-vous prendre le pion de l'adversaire en passant ?", "Prise en passant", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                    option = JOptionPane.showConfirmDialog(null, "Voulez-vous prendre le pion de l'adversaire en passant ?", "Prise en passant", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 }
             }
             if((option == 0 || choix == 0) && possPionPrise.size()!=0){
@@ -468,9 +516,5 @@ public class PlateauG {
                 return false;
         }
         return false;
-    }
-
-    public void setCompteurToursSansPrises(int compteurToursSansPrises) {
-        this.compteurToursSansPrises = compteurToursSansPrises;
     }
 }
